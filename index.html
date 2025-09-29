@@ -1,44 +1,185 @@
 <!DOCTYPE html>
-
+<html lang="en">
 <head>
-    <meta name="identifier-url" content="https://burs.tech/" />
-    <meta name="title" content="Bur's Tech" />
-    <meta name="description" content="Small portfolio by Bur(AndBY)" />
-    <meta name="abstract" content="Small portfolio by Bur(AndBY)" />
-    <meta name="keywords" content="burandby,jackbox,rpi,gba,retro,minecraft,twitch,yt,youtube,gaming,bur,burs,bursml,jackboxml,jackboxfun,jackboxru" />
-    <meta name="author" content="BurAndBY" />
-    <meta name="revisit-after" content="2" />
-    <meta name="language" content="EN, RU" />
-    <meta name="copyright" content="© 2023 BurAndBY" />
-    <meta name="robots" content="All" />
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@burandby">
-    <meta name="twitter:title" content="Bur's Tech">
-    <meta name="twitter:description" content="Small Portfolio made by Bur(AndBY) which showcases his projects. ">
-    <meta name="twitter:image" content="https://interface-experience.org/site/wp-content/uploads/2015/01/IE-008KKEDIT.jpg">
-    <meta name="og:image" content="https://interface-experience.org/site/wp-content/uploads/2015/01/IE-008KKEDIT.jpg">
-    <link rel="stylesheet" href="main.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>burandby :: bio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Source Code Pro', monospace;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+        }
+        
+        .typing-animation {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #00ff00;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #00ff00 }
+        }
+        
+        .ascii-divider {
+            color: #5a2d82;
+            letter-spacing: -2px;
+            line-height: 0.8;
+        }
+        
+        .homestuck-font {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        .avatar-border {
+            border: 3px solid #5a2d82;
+            box-shadow: 0 0 15px rgba(90, 45, 130, 0.5);
+        }
+    </style>
 </head>
+<body class="min-h-screen flex flex-col items-center p-4 md:p-8">
+    <!-- Terminal Container -->
+    <div class="w-full max-w-4xl bg-black bg-opacity-90 rounded-lg border-2 border-purple-900 p-6 shadow-lg shadow-purple-900/20">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex items-center space-x-4">
+                <div class="avatar-border rounded-full overflow-hidden">
+                    <img src="https://cdn.discordapp.com/avatars/855387897002590248/f1382cc3dd63f08f819720cd8f3cc424?size=1024" alt="burandby avatar" class="w-16 h-16 object-cover">
+                </div>
+                <div>
+                    <div class="flex items-center space-x-4">
+                        <h1 class="text-3xl md:text-4xl font-bold text-purple-400 homestuck-font">
+                            <span class="typing-animation">burandby</span>
+                        </h1>
+                        <span class="text-l text-gray-400">/ bur</span>
+                        <span class="blinking-cursor text-green-400">_</span>
+                    </div>
+                    <p class="text-lg text-gray-400 mt-2">> Andrew</p>
+                    <p class="text-gray-300 text-xs mt-1">>> ART BY: wretchedartistic</p>
+                  <div class="flex space-x-3 mt-2">
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors" title="Bluesky">
+                            <pre class="text-xs"><a href="https://bsky.app/profile/burandby.neocities.org">[bsky]</a></pre>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors" title="Discord">
+                            <pre class="text-xs"><a href="http://discord.com/users/855387897002590248">[dsc]</a></pre>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors" title="Telegram">
+                          <pre class="text-xs"><a href="https://t.me/burshideout">[tg]</a></pre>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ASCII Art Divider -->
+<div class="ascii-divider text-center my-6">
+            <pre class="text-xs md:text-sm">
+  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.  
+:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\ 
+'      --'      .-'      --'      --'      --'      -.'      --'      
+            </pre>
+        </div>
+        <!-- Interests Section -->
+<div class="mt-6">
+            <h2 class="text-xl text-purple-300 mb-4 homestuck-font">> INTERESTS:</h2>
+            
+            <div class="ml-4">
+                <p class="text-blue-300 mb-2">>> Games:</p>
+                <ul class="ml-6 space-y-1">
+                  <li class="text-blue-400"><a href="https://p3re.jp/">> Persona 3 Reload</a></li>
+                  <li class="text-red-400"><a href="https://www.sonicthehedgehog.com/sonic-racing/">> Sonic Racing Crossworlds</a></li>
+                    <li class="text-green-400"><a href="https://www.agathachristie.com/games/death-on-the-nile">> Agatha Christie: Death on the Nile</a></li>
+                  <li class="text-purple-400"><a href="https://votv.dev">> Voices of the Void</a></li>
+                </ul>
+                <p class="text-yellow-300 mt-4 mb-2">>> Books:</p>
+                <ul class="ml-6">
+                    <li class="text-white font-bold"><a href="https://knihi.com/Uladzimir_Karatkievic/Corny_zamak_Alsanski.html">> "Чорны замак Альшанскі" by Уладзімір Караткевіч</a></li>
+                </ul>
 
-<body>
-    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
-    
-    <header>
-        <nav>
-          <a href="/" class="underline">~/</a>
-          <a href="/projects" class="underline">~/projects</a>
-          <a href="/mysites" class="underline">~/mysites</a>
-          <a href="/sources" class="underline">~/sources</a>
-        </nav>
-      </header>
-      <div class="site-title">
-        <h1>
-          <a href="/">Bur's Portfolio:$</a><span class="cursor">█</span>
-        </h1>
-      </div>
-    </header>
-    <div id="app" class="container">
-
+                <p class="text-pink-300 mt-4 mb-2">>> Music:</p>
+                <ul class="ml-6 space-y-1">
+                    <li class="text-cyan-400"><a href="https://album.link/s/2Yvoc69MgVKWBRkdD9WIUC">> Clarion - Clarion</a></li>
+                    <li class="text-indigo-400"><a href="https://album.link/s/2PSgMApk089eV6e5LPbQeS">> Ixnay on the Hombre - The Offsprings</a></li>
+                    <li class="text-fuchsia-400"><a href="https://album.link/s/3DuiGV3J09SUhvp8gqNx8h">> Three Cheers for Sweet Revenge - My Chemical Romance</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Status Section -->
+<div class="mt-8">
+            <h2 class="text-xl text-purple-300 mb-2 homestuck-font">> CURRENT STATUS:</h2>
+            <p class="text-gray-400">> [SYSTEM]: Processing signals</p>
+        </div>
+        
+        <!-- Footer with Blinking Cursor -->
+        <div class="mt-12 pt-4 border-t border-purple-900 flex items-center">
+            <span class="text-gray-500 mr-2">> _</span>
+            <span class="blinking-cursor text-green-400">|</span>
+        </div>
     </div>
-    <script src="app.js"></script>
-</body> 
+    
+    <!-- Vanta.js Globe Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <script>
+        VANTA.GLOBE({
+            el: "body",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x5a2d82,
+            backgroundColor: 0x0
+        });
+    </script>
+    
+    <script>
+        feather.replace();
+        
+        // Typewriter effect for the username
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.typing-animation');
+            elements.forEach(el => {
+                const text = el.textContent;
+                el.textContent = '';
+                let i = 0;
+                const typing = setInterval(() => {
+                    if (i < text.length) {
+                        el.textContent += text.charAt(i);
+                        i++;
+                    } else {
+                        clearInterval(typing);
+                        el.style.borderRight = 'none';
+                    }
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
