@@ -15,6 +15,7 @@
             background-color: #0a0a0a;
             color: #e0e0e0;
             overflow-x: hidden;
+            touch-action: pan-y;
         }
         
         .blinking-cursor {
@@ -58,6 +59,182 @@
             border: 3px solid #5a2d82;
             box-shadow: 0 0 15px rgba(90, 45, 130, 0.5);
         }
+        
+        /* Coverflow Styles */
+        .coverflow-container {
+            perspective: 1200px;
+            height: 320px;
+            position: relative;
+            margin: 20px -40px;
+            overflow: hidden;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .coverflow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            cursor: grab;
+        }
+        
+        .coverflow:active {
+            cursor: grabbing;
+        }
+        
+        .album-cover {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: #111;
+            border: 2px solid #5a2d82;
+            border-radius: 8px;
+            transition: transform 0.5s, opacity 0.5s, z-index 0.5s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        
+        .album-art {
+            width: 160px;
+            height: 160px;
+            object-fit: cover;
+            border: 1px solid #333;
+            margin-bottom: 4px;
+        }
+        
+        .album-title {
+            font-size: 0.8rem;
+            color: #e0e0e0;
+            text-align: center;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .album-artist {
+            font-size: 0.7rem;
+            color: #5a2d82;
+            text-align: center;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .coverflow-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+            gap: 10px;
+        }
+        
+        .coverflow-btn {
+            background: #222;
+            border: 1px solid #5a2d82;
+            color: #e0e0e0;
+            padding: 5px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Source Code Pro', monospace;
+            transition: all 0.2s;
+        }
+        
+        .coverflow-btn:hover {
+            background: #5a2d82;
+            color: white;
+        }
+        
+        .coverflow-indicator {
+            text-align: center;
+            margin-top: 5px;
+            color: #5a2d82;
+            font-size: 0.9rem;
+        }
+        
+        .album-info {
+            margin-top: 10px;
+            padding: 15px;
+            background: #111;
+            border: 1px solid #5a2d82;
+            border-radius: 5px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .album-info-title {
+            color: #5a2d82;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .album-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .album-genre {
+            color: #e0e0e0;
+        }
+        
+        .album-year {
+            color: #e0e0e0;
+        }
+        
+        .album-tracks {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .album-track {
+            padding: 5px 0;
+            border-bottom: 1px solid #222;
+            color: #e0e0e0;
+        }
+        
+        .album-track:last-child {
+            border-bottom: none;
+        }
+        
+        .album-link {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #5a2d82;
+            text-decoration: none;
+        }
+        
+        .album-link:hover {
+            text-decoration: underline;
+        }
+        
+        .swipe-hint {
+            text-align: center;
+            margin-top: 10px;
+            color: #444;
+            font-size: 0.8rem;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .swipe-hint {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center p-4 md:p-8">
@@ -80,14 +257,14 @@
                     <p class="text-lg text-gray-400 mt-2">> Andrew</p>
                     <p class="text-gray-300 text-xs mt-1">>> ART BY: wretchedartistic</p>
                   <div class="flex space-x-3 mt-2">
-                        <a href="#" class="text-gray-400 hover:text-blue-400 transition-colors" title="Bluesky">
-                            <pre class="text-xs"><a href="https://bsky.app/profile/burandby.neocities.org">[bsky]</a></pre>
+                        <a href="https://bsky.app/profile/burandby.neocities.org" class="text-gray-400 hover:text-blue-400 transition-colors" title="Bluesky">
+                            <pre class="text-xs">[bsky]</pre>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-indigo-400 transition-colors" title="Discord">
-                            <pre class="text-xs"><a href="http://discord.com/users/855387897002590248">[dsc]</a></pre>
+                        <a href="http://discord.com/users/855387897002590248" class="text-gray-400 hover:text-indigo-400 transition-colors" title="Discord">
+                            <pre class="text-xs">[dsc]</pre>
                         </a>
-                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors" title="Telegram">
-                          <pre class="text-xs"><a href="https://t.me/burshideout">[tg]</a></pre>
+                        <a href="https://t.me/burshideout" class="text-gray-400 hover:text-blue-500 transition-colors" title="Telegram">
+                          <pre class="text-xs">[tg]</pre>
                         </a>
                     </div>
                 </div>
@@ -102,32 +279,85 @@
 '      --'      .-'      --'      --'      --'      -.'      --'      
             </pre>
         </div>
-        <!-- Interests Section -->
-<div class="mt-6">
-            <h2 class="text-xl text-purple-300 mb-4 homestuck-font">> INTERESTS:</h2>
+        <!-- Music Section with Coverflow -->
+        <div class="mt-6">
+            <h2 class="text-xl text-purple-300 mb-4 homestuck-font">> ABOUT ME:</h2>
+            <p class="text-white-400">Hi, I'm bur. I like software development, listening to music and speedrunning videogames. </p> <br/>
+            <h3 class="text-l text-purple-300 mb-4 homestuck-font">> MUSIC:</h3>
+            <p class="text-white-400">There is a lot of music I like but this are my all-time favorites: </p> <br/>
+            <div class="coverflow-container" id="coverflow-container">
+                <div class="coverflow" id="coverflow">
+                    <!-- Album 1 -->
+                    <div class="album-cover" id="album-1" data-index="0">
+                        <img src="https://archive.org/download/mbid-69f6949b-08cb-45d4-af62-b39dae8a0d62/mbid-69f6949b-08cb-45d4-af62-b39dae8a0d62-43241763016_thumb250.jpg" alt="Clarion Album Cover" class="album-art">
+                        <div class="album-title">Clarion</div>
+                        <div class="album-artist">Clarion</div>
+                    </div>
+                    
+                    <!-- Album 2 -->
+                    <div class="album-cover" id="album-2" data-index="1">
+                        <img src="https://ia800100.us.archive.org/4/items/mbid-b481b2eb-5961-40d6-9d82-2918dd173be9/mbid-b481b2eb-5961-40d6-9d82-2918dd173be9-43228966071_thumb250.jpg" alt="Ixnay on the Hombre Album Cover" class="album-art">
+                        <div class="album-title">Ixnay on the Hombre</div>
+                        <div class="album-artist">The Offspring</div>
+                    </div>
+                    
+                    <!-- Album 3 -->
+                    <div class="album-cover" id="album-3" data-index="2">
+                        <img src="https://archive.org/download/mbid-9108adbb-b065-408b-9f59-c1af1f4a241a/mbid-9108adbb-b065-408b-9f59-c1af1f4a241a-11144521161_thumb250.jpg" alt="Three Cheers for Sweet Revenge Album Cover" class="album-art">
+                        <div class="album-title">Three Cheers for Sweet Revenge</div>
+                        <div class="album-artist">My Chemical Romance</div>
+                    </div>
+                    
+                    <!-- Album 4 -->
+                    <div class="album-cover" id="album-4" data-index="3">
+                        <img src="https://coverartarchive.org/release/76a99f97-28e3-415c-a915-617dac0d852b/39333257799-250.jpg" alt="my anti-aircraft friend Album Cover" class="album-art">
+                        <div class="album-title">my anti-aircraft friend</div>
+                        <div class="album-artist">julie</div>
+                    </div>
+                    
+                    <!-- Album 5 -->
+                    <div class="album-cover" id="album-5" data-index="4">
+                        <img src="https://i.scdn.co/image/ab67616d0000b2739fba3529eaf6979c736806e6" alt="Flyleaf Album Cover" class="album-art">
+                        <div class="album-title">Flyleaf</div>
+                        <div class="album-artist">Flyleaf</div>
+                    </div>
+                </div>
+            </div>
             
-            <div class="ml-4">
-                <p class="text-blue-300 mb-2">>> Games:</p>
+            <div class="swipe-hint">>> Swipe to navigate albums</div>
+          
+            <div class="coverflow-indicator" id="coverflow-indicator">
+                [1/5] > Clarion - Clarion
+            </div>
+            
+            <!-- Album Details -->
+            <div class="album-info" id="album-info">
+                <div class="album-info-title">Clarion - Clarion</div>
+                <div class="album-meta">
+                    <div class="album-genre">Genre: <span id="album-genre">Shoegaze / Noise Rock</span></div>
+                    <div class="album-year">Year: <span id="album-year">2024</span></div>
+                </div>
+                <a href="https://album.link/s/2Yvoc69MgVKWBRkdD9WIUC" class="album-link" target="_blank" id="album-link">[LISTEN]</a>
+            </div>
+        </div>  
+          
+            <div class="coverflow-controls">
+                <button class="coverflow-btn" onclick="prevAlbum()">PREV</button>
+                <button class="coverflow-btn" onclick="nextAlbum()">NEXT</button>
+            </div>
+        
+                <h3 class="text-l text-purple-300 mb-4 homestuck-font">> GAMES:</h3>
                 <ul class="ml-6 space-y-1">
                   <li class="text-blue-400"><a href="https://p3re.jp/">> Persona 3 Reload</a></li>
                   <li class="text-red-400"><a href="https://www.sonicthehedgehog.com/sonic-racing/">> Sonic Racing Crossworlds</a></li>
                     <li class="text-green-400"><a href="https://www.agathachristie.com/games/death-on-the-nile">> Agatha Christie: Death on the Nile</a></li>
                   <li class="text-purple-400"><a href="https://votv.dev">> Voices of the Void</a></li>
                 </ul>
-                <p class="text-yellow-300 mt-4 mb-2">>> Books:</p>
+                <p class="text-l text-purple-300 mb-4 homestuck-font">>> Books:</p>
                 <ul class="ml-6">
                     <li class="text-white font-bold"><a href="https://knihi.com/Uladzimir_Karatkievic/Corny_zamak_Alsanski.html">> "Чорны замак Альшанскі" by Уладзімір Караткевіч</a></li>
                 </ul>
-
-                <p class="text-pink-300 mt-4 mb-2">>> Music:</p>
-                <ul class="ml-6 space-y-1">
-                    <li class="text-cyan-400"><a href="https://album.link/s/2Yvoc69MgVKWBRkdD9WIUC">> Clarion - Clarion</a></li>
-                    <li class="text-indigo-400"><a href="https://album.link/s/2PSgMApk089eV6e5LPbQeS">> Ixnay on the Hombre - The Offsprings</a></li>
-                    <li class="text-fuchsia-400"><a href="https://album.link/s/3DuiGV3J09SUhvp8gqNx8h">> Three Cheers for Sweet Revenge - My Chemical Romance</a></li>
-                </ul>
-            </div>
-        </div>
-        
+            
         <!-- Status Section -->
 <div class="mt-8">
             <h2 class="text-xl text-purple-300 mb-2 homestuck-font">> CURRENT STATUS:</h2>
@@ -145,25 +375,190 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
     <script>
-        VANTA.GLOBE({
-            el: "body",
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x5a2d82,
-            backgroundColor: 0x0
-        });
-    </script>
-    
-    <script>
-        feather.replace();
+        // Coverflow functionality
+        let currentAlbum = 0;
+        const totalAlbums = 5;
+        const albums = document.querySelectorAll('.album-cover');
+        const indicator = document.getElementById('coverflow-indicator');
+        const albumInfo = document.getElementById('album-info');
         
-        // Typewriter effect for the username
+        // Swipe detection variables
+        let startX = 0;
+        let endX = 0;
+        const swipeThreshold = 50;
+        
+        // Album data
+        const albumData = [
+            {
+                title: "Clarion - Clarion",
+                genre: "Shoegaze / Noise Rock",
+                year: "2024",
+                tracks: [],
+                link: "https://album.link/s/2Yvoc69MgVKWBRkdD9WIUC"
+            },
+            {
+                title: "Ixnay on the Hombre - The Offspring",
+                genre: "Punk Rock",
+                year: "1997",
+                tracks: [],
+                link: "https://album.link/s/2PSgMApk089eV6e5LPbQeS"
+            },
+            {
+                title: "Three Cheers for Sweet Revenge - My Chemical Romance",
+                genre: "Emo / Post-Hardcore",
+                year: "2004",
+                tracks: [],
+                link: "https://album.link/by/i/1156311431"
+            },
+            {
+                title: "my anti-aircraft friend - julie",
+                genre: "Shoegaze / Noise Rock",
+                year: "2024",
+                tracks: [],
+                link: "https://album.link/s/14SJbJMseOJ2W8HlWLwNgJ"
+            },
+            {
+                title: "Flyleaf - Flyleaf",
+                genre: "Christian Rock / Alternative Rock",
+                year: "2005",
+                tracks: [],
+                link: "https://album.link/s/4Hv9JeNCe9bMyTrgt9NjXt"
+            }
+        ];
+        
+        function updateCoverflow() {
+            albums.forEach((album, index) => {
+                const distance = Math.abs(index - currentAlbum);
+                let transform = '';
+                let zIndex = '';
+                let opacity = '';
+                
+                if (index === currentAlbum) {
+                    // Center album
+                    transform = 'translateZ(0px) rotateY(0deg)';
+                    zIndex = '10';
+                    opacity = '1';
+                } else if (index < currentAlbum) {
+                    // Left albums
+                    const offset = (currentAlbum - index) * 120;
+                    transform = `translateX(-${offset}px) translateZ(-100px) rotateY(30deg)`;
+                    zIndex = (5 - distance).toString();
+                    opacity = (1 - distance * 0.3).toString();
+                } else {
+                    // Right albums
+                    const offset = (index - currentAlbum) * 120;
+                    transform = `translateX(${offset}px) translateZ(-100px) rotateY(-30deg)`;
+                    zIndex = (5 - distance).toString();
+                    opacity = (1 - distance * 0.3).toString();
+                }
+                
+                album.style.transform = transform;
+                album.style.zIndex = zIndex;
+                album.style.opacity = opacity;
+            });
+            
+            // Update indicator and album info
+            indicator.textContent = `[${currentAlbum + 1}/${totalAlbums}] > ${albumData[currentAlbum].title}`;
+            
+            // Update album info
+            const albumTitle = albumInfo.querySelector('.album-info-title');
+            const albumGenre = document.getElementById('album-genre');
+            const albumYear = document.getElementById('album-year');
+            const albumLink = document.getElementById('album-link');
+            
+            albumTitle.textContent = albumData[currentAlbum].title;
+            albumGenre.textContent = albumData[currentAlbum].genre;
+            albumYear.textContent = albumData[currentAlbum].year;
+            albumLink.href = albumData[currentAlbum].link;
+        }
+        
+        function nextAlbum() {
+            currentAlbum = (currentAlbum + 1) % totalAlbums;
+            updateCoverflow();
+        }
+        
+        function prevAlbum() {
+            currentAlbum = (currentAlbum - 1 + totalAlbums) % totalAlbums;
+            updateCoverflow();
+        }
+        
+        // Swipe functionality
+        function handleTouchStart(e) {
+            startX = e.touches[0].clientX;
+        }
+        
+        function handleTouchMove(e) {
+            if (!startX) return;
+            endX = e.touches[0].clientX;
+        }
+        
+        function handleTouchEnd() {
+            if (!startX || !endX) return;
+            
+            const diffX = startX - endX;
+            
+            if (Math.abs(diffX) > swipeThreshold) {
+                if (diffX > 0) {
+                    // Swipe left - next album
+                    nextAlbum();
+                } else {
+                    // Swipe right - previous album
+                    prevAlbum();
+                }
+            }
+            
+            // Reset values
+            startX = 0;
+            endX = 0;
+        }
+        
+        // Mouse drag functionality
+        function handleMouseDown(e) {
+            startX = e.clientX;
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+        
+        function handleMouseMove(e) {
+            if (!startX) return;
+            endX = e.clientX;
+        }
+        
+        function handleMouseUp() {
+            if (!startX || !endX) return;
+            
+            const diffX = startX - endX;
+            
+            if (Math.abs(diffX) > swipeThreshold) {
+                if (diffX > 0) {
+                    // Drag left - next album
+                    nextAlbum();
+                } else {
+                    // Drag right - previous album
+                    prevAlbum();
+                }
+            }
+            
+            // Reset values
+            startX = 0;
+            endX = 0;
+            
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextAlbum();
+            } else if (e.key === 'ArrowLeft') {
+                prevAlbum();
+            }
+        });
+        
+        // Initialize coverflow
         document.addEventListener('DOMContentLoaded', function() {
+            // Typewriter effect for the username
             const elements = document.querySelectorAll('.typing-animation');
             elements.forEach(el => {
                 const text = el.textContent;
@@ -179,7 +574,36 @@
                     }
                 }, 100);
             });
+            
+            // Initialize coverflow
+            updateCoverflow();
+            
+            // Add event listeners for swipe
+            const coverflow = document.getElementById('coverflow');
+            coverflow.addEventListener('touchstart', handleTouchStart, { passive: true });
+            coverflow.addEventListener('touchmove', handleTouchMove, { passive: true });
+            coverflow.addEventListener('touchend', handleTouchEnd);
+            
+            // Add event listeners for mouse drag
+            coverflow.addEventListener('mousedown', handleMouseDown);
+            
+            // Initialize Vanta.js
+            VANTA.GLOBE({
+                el: "body",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                color: 0x5a2d82,
+                backgroundColor: 0x0
+            });
         });
+    </script> 
+    <script>
+        feather.replace();
     </script>
 </body>
 </html>
