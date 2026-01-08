@@ -1,374 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCSR Ranked: Name 50 Runners</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCSR Ranked: Name 50 Runners</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;700&display=swap');
 
-        body {
-            font-family: 'Source Code Pro', monospace;
-            background-color: #0a0a0a;
-            color: #e0e0e0;
-            overflow-x: hidden;
-        }
+    body {
+      font-family: 'Source Code Pro', monospace;
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      overflow-x: hidden;
+    }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #5a2d82; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #5a2d82; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
 
-        .homestuck-font {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
+    .homestuck-font {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+    }
 
-        /* Animations */
-        .blinking-cursor {
-            animation: blink 1s step-end infinite;
-        }
+    /* Animations */
+    .blinking-cursor { animation: blink 1s step-end infinite; }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
+    .card-anim { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
 
-        .card-anim { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
+    /* Glass/Terminal Header */
+    .terminal-glass {
+      background: rgba(10, 10, 10, 0.95);
+      border-bottom: 2px solid #5a2d82;
+      box-shadow: 0 0 15px rgba(90, 45, 130, 0.3);
+    }
 
-        /* Glass/Terminal Header */
-        .terminal-glass {
-            background: rgba(10, 10, 10, 0.95);
-            border-bottom: 2px solid #5a2d82;
-            box-shadow: 0 0 15px rgba(90, 45, 130, 0.3);
-        }
-
-        /* Card Styling to match Album Covers */
-        .runner-card {
-            background: #111;
-            border: 1px solid #5a2d82;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .runner-card:hover {
-            border-color: #00ff00;
-        }
-    </style>
+    /* Card Styling to match Album Covers */
+    .runner-card {
+      background: #111;
+      border: 1px solid #5a2d82;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .runner-card:hover {
+      border-color: #00ff00;
+    }
+  </style>
 </head>
+
 <body class="min-h-screen flex flex-col items-center">
 
-    <!-- Sticky Header / Game Stats -->
-    <div class="sticky top-0 z-50 w-full terminal-glass">
-        <div class="max-w-6xl mx-auto p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            
-            <!-- Title & Status -->
-            <div class="flex flex-col items-center md:items-start">
-                <h1 class="text-2xl font-bold text-purple-400 homestuck-font">
-                    > MCSR Ranked Quiz
-                </h1>
-                <div class="text-xs text-gray-400 flex gap-2 font-mono">
-                    <span class="text-purple-300">> [SYSTEM]:</span>
-                    <span id="connectionStatus" class="text-yellow-500">Connecting...</span>
-                    <span>•</span>
-                    <span id="poolSize">Loading Database...</span>
-                </div>
-            </div>
+  <!-- Sticky Header / Game Stats -->
+  <div class="sticky top-0 z-50 w-full terminal-glass">
+    <div class="max-w-6xl mx-auto p-4 flex flex-col md:flex-row items-center justify-between gap-4">
 
-            <!-- Timer -->
-            <div class="font-mono text-3xl font-bold tracking-widest text-green-400 tabular-nums drop-shadow-lg" style="text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);" id="timer">
-                00:00:000
-            </div>
+      <!-- Title & Status -->
+      <div class="flex flex-col items-center md:items-start">
+        <h1 class="text-2xl font-bold text-purple-400 homestuck-font">
+          &gt; MCSR Ranked Quiz
+        </h1>
+        <div class="text-xs text-gray-400 flex gap-2 font-mono">
+          <span class="text-purple-300">&gt; [SYSTEM]:</span>
+          <span id="connectionStatus" class="text-yellow-500">Connecting...</span>
+          <span>•</span>
+          <span id="poolSize">Loading Database...</span>
+        </div>
+      </div>
 
-            <!-- Score -->
-            <div class="flex items-center gap-3 bg-black/50 px-4 py-2 rounded border border-purple-900">
-                <div class="text-right">
-                    <p class="text-[10px] text-gray-500 uppercase tracking-wider">Progress</p>
-                    <p class="text-xl font-bold text-purple-400 leading-none">
-                        <span id="score">0</span><span class="text-gray-600 text-lg">/50</span>
-                    </p>
-                </div>
-                <!-- Mini Progress Circle -->
-                <svg class="w-10 h-10 transform -rotate-90">
-                    <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="4" fill="transparent" class="text-gray-900" />
-                    <circle id="progressRing" cx="20" cy="20" r="16" stroke="currentColor" stroke-width="4" fill="transparent" 
-                        class="text-green-500 transition-all duration-500" 
-                        stroke-dasharray="100" stroke-dashoffset="100" />
-                </svg>
-            </div>
+      <!-- Timer -->
+      <div
+        class="font-mono text-3xl font-bold tracking-widest text-green-400 tabular-nums drop-shadow-lg"
+        style="text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);"
+        id="timer"
+      >
+        00:00:000
+      </div>
+
+      <!-- Score -->
+      <div class="flex items-center gap-3 bg-black/50 px-4 py-2 rounded border border-purple-900">
+        <div class="text-right">
+          <p class="text-[10px] text-gray-500 uppercase tracking-wider">Progress</p>
+          <p class="text-xl font-bold text-purple-400 leading-none">
+            <span id="score">0</span><span class="text-gray-600 text-lg">/20</span>
+          </p>
         </div>
 
-        <!-- Input Area -->
-        <div class="w-full bg-black/80 border-t border-purple-900/50">
-            <div class="max-w-3xl mx-auto p-3 flex items-center">
-                <span class="text-green-400 mr-2 text-xl">></span>
-                <input type="text" id="runnerInput" 
-                    class="w-full bg-transparent border-none text-white focus:outline-none placeholder-gray-600 font-mono text-lg"
-                    placeholder="Type a runner's name (e.g. Feinberg, couriway)..." autocomplete="off" disabled>
-                <span class="blinking-cursor text-green-400 text-xl">_</span>
-            </div>
-        </div>
+        <!-- Mini Progress Circle -->
+        <svg class="w-10 h-10 transform -rotate-90">
+          <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="4" fill="transparent" class="text-gray-900" />
+          <circle
+            id="progressRing"
+            cx="20" cy="20" r="16"
+            stroke="currentColor" stroke-width="4" fill="transparent"
+            class="text-green-500 transition-all duration-500"
+            stroke-dasharray="100" stroke-dashoffset="100"
+          />
+        </svg>
+      </div>
     </div>
 
-    <!-- Win Message / Share Section (Hidden by default) -->
-    <div id="winSection" class="hidden w-full max-w-2xl mt-8 px-4 animate-fade-in z-40">
-        <div class="bg-black/90 border-2 border-green-500 rounded-lg p-6 text-center space-y-4 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
-            <h2 class="text-3xl font-bold text-green-400 homestuck-font">> CHALLENGE COMPLETE!</h2>
-            <p class="text-gray-300">You named 50 runners in <span id="finalTime" class="font-mono font-bold text-purple-400"></span></p>
-            <button onclick="shareResult()" class="inline-flex items-center gap-2 px-6 py-3 bg-purple-900/50 hover:bg-purple-800 border border-purple-500 text-white font-bold rounded transition-all active:scale-95">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                Share Result
-            </button>
-            <p id="copyFeedback" class="text-sm text-green-400/0 transition-opacity duration-300">>> Copied to clipboard!</p>
-        </div>
+    <!-- Input Area -->
+    <div class="w-full bg-black/80 border-t border-purple-900/50">
+      <div class="max-w-3xl mx-auto p-3 flex items-center">
+        <span class="text-green-400 mr-2 text-xl">&gt;</span>
+        <input
+          type="text"
+          id="runnerInput"
+          class="w-full bg-transparent border-none text-white focus:outline-none placeholder-gray-600 font-mono text-lg"
+          placeholder="Type a runner's name (e.g. Feinberg, couriway)..."
+          autocomplete="off"
+          disabled
+        />
+        <span class="blinking-cursor text-green-400 text-xl">_</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Win Message / Share Section (Hidden by default) -->
+  <div id="winSection" class="hidden w-full max-w-2xl mt-8 px-4 animate-fade-in z-40">
+    <div class="bg-black/90 border-2 border-green-500 rounded-lg p-6 text-center space-y-4 shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+      <h2 class="text-3xl font-bold text-green-400 homestuck-font">&gt; CHALLENGE COMPLETE!</h2>
+      <p class="text-gray-300">You named 20 runners in <span id="finalTime" class="font-mono font-bold text-purple-400"></span></p>
+      <button
+        onclick="shareResult()"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-purple-900/50 hover:bg-purple-800 border border-purple-500 text-white font-bold rounded transition-all active:scale-95"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+          </path>
+        </svg>
+        Share Result
+      </button>
+      <p id="copyFeedback" class="text-sm text-green-400/0 transition-opacity duration-300">&gt;&gt; Copied to clipboard!</p>
+    </div>
+  </div>
+
+  <!-- Grid Container -->
+  <div class="w-full max-w-7xl p-4 md:p-8 pb-20 z-10">
+    <!-- ASCII Divider -->
+    <div class="text-purple-500 text-center mb-6 opacity-50 text-[10px] md:text-xs leading-none select-none">
+      <pre>
+  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.
+:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\
+'      --'      .-'      --'      --'      --'      -.'      --'
+      </pre>
     </div>
 
-    <!-- Grid Container -->
-    <div class="w-full max-w-7xl p-4 md:p-8 pb-20 z-10">
-        <!-- ASCII Divider -->
-        <div class="text-purple-500 text-center mb-6 opacity-50 text-[10px] md:text-xs leading-none select-none">
-            <pre>
-  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.  
-:::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\::::::::.\ 
-'      --'      .-'      --'      --'      --'      -.'      --'      
-            </pre>
-        </div>
-        
-        <div id="grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            <!-- Cards injected via JS -->
-        </div>
+    <div id="grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+      <!-- Cards injected via JS -->
     </div>
+  </div>
 
-    <!-- Vanta.js Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
-    
-    <script>
-        // --- Init Vanta Background ---
-        document.addEventListener('DOMContentLoaded', () => {
-            VANTA.GLOBE({
-                el: "body",
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200.00,
-                minWidth: 200.00,
-                scale: 1.00,
-                scaleMobile: 1.00,
-                color: 0x5a2d82, // Purple
-                backgroundColor: 0x0a0a0a // Dark background
-            });
-        });
+  <!-- Vanta.js Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
 
-        // --- Game Logic ---
-        const API_BASE = 'https://mcsrranked.com/api/leaderboard';
-        const TARGET_COUNT = 50; 
-        const FETCH_LIMIT = 1500; 
+  <script>
+    // ------------------------------
+    // Aliases (Group UUID -> aliases)
+    // These should work even if the API doesn't expose matching ids.
+    // ------------------------------
+    const aliases = {
+      "ac601ce7-376f-49ce-a7ce-14cd577dac85": ["blaze", "blazemind", "bm"],
+      "a54e3bc4-c635-4b07-a236-b81efbcfe791": ["infume", "infoomi"],
+      "9a8e24df-4c85-49d6-96a6-951da84fa5c4": ["feinberg", "fein", "fien", "fienberg"],
+      "cc432b26-26a4-4ae1-836a-50244adbf468": ["watermelon", "wm", "melon", "Watermelon1708", "L9_CarrotEater", "XSpocony_MaciekX", "DziabaDziuba"],
+      "92b63a39-b36a-445f-a94c-77ae212dcea3": ["mongey", "bbm", "bigbigmongey", "big_big_mongey", 'bing_pigs'],
+      "4cf401d7-b947-4756-b06a-653867d22fca": ["jay", "bad", "badgamer"],
+      "78a8ec9f-99d3-4371-b73d-ecd2a78ff9b0": ["TUDORULE", "tudo", "L9_LABUBUDEALER6", "RambuncGamingX89", "STUPIDRULE"],
+      "bc80af38-933f-4ae1-9b04-94681a54422b": ["anco", "ancoboyyy", "ancoboyy"],
+      "0b6c44a4-81e1-4c7e-88ac-836c92499ff4": ["tiger", "tigree", "TIGERMCSR", "NOHACKSJUSTTIGER", "L9_FURRYGIRLMEOW"],
+      "a5d83ff0-4216-4ff1-b862-dedc118c1dae": ["steez", "BigBallGaming32", "xXxX_PvPG0D_XxXx"],
+      "70eb9286-e3e2-4153-a8b3-7c8f884f1292": ["rowl", "bowl", "6rowl", "7rowl", "7bowl", "L9_SOFTCATBOY69"],
+      "e4808bc3-e1e3-4798-8cbb-59b55d723e0f": ["ddb", "danny", "dandannyboy"],
+      "7665f76f-431b-41c6-b321-bea16aff913b": ["lowkey", "l0wkey", "lowk3y_"],
+      "388533d5-a2ad-4b34-9a31-db4738670a4b": ["vstrid", "v_strid", "vs"],
+      "41d79a18-ef55-40d6-bb3d-68634f06a3b1": ["okrzej", "okzrej", "okrzei"],
+      "3b01d4b4-fef1-4f17-8b75-f05c04dd34ef": ["bs", "beef", "beefsalad"],
+      "4aed1e5e-8f5c-44e2-bc06-66e0c03781af": ["emerald", "nem", "em"],
+      "5a32f1e5-6098-47c6-91c0-7730f973397c": ["darvy", "darv", "DARVY__X1", "darvy_CAR89", "Darvy1337"],
+      "7751d507-ab36-4914-bac7-67a4d2574753": ["lumeh"],
+      "2988fcfb-c6b1-41a4-97fa-a915e13b6592": ["automatt", "automat"],
+      "aa5a894a-4d53-40f4-9683-fdfd1ea9c523": ["crab", "sc", "skycrab", "Pinne"],
+      "a0a672a0-bc19-4540-bc19-5220dc170dba": ["jacko", "jackowacko"],
+      "048de518-0079-4a20-8de7-f01652513c32": ["chris", "L9_FOXGIRLPAWJOB", "foxgirlpawjob", "ChugokuPoletop"],
+      "addd8907-6440-4097-b3f1-2acdde2adf33": ["hypno", "hypnotic", "Hypn0ticMCSR", "Hypn0ic"]
+    };
 
-        let allRunners = new Map();
-        let foundCount = 0;
-        let foundIds = new Set();
-        
-        let timerInterval = null;
-        let startTime = null;
-        let isGameRunning = false;
-        let isGameOver = false;
+    // --- Build alias lookup independent of API ids ---
+    const aliasToGroupId = new Map();   // "bm" -> group uuid
+    const groupIdToNames = new Map();   // group uuid -> [aliases...]
+    for (const [gid, names] of Object.entries(aliases)) {
+      const normalized = names.map(n => String(n).toLowerCase().trim());
+      groupIdToNames.set(gid, normalized);
+      for (const n of normalized) aliasToGroupId.set(n, gid);
+    }
 
-        const grid = document.getElementById('grid');
-        const input = document.getElementById('runnerInput');
-        const scoreEl = document.getElementById('score');
-        const ringEl = document.getElementById('progressRing');
-        const timerEl = document.getElementById('timer');
-        const statusEl = document.getElementById('connectionStatus');
-        const poolEl = document.getElementById('poolSize');
-        const winSection = document.getElementById('winSection');
+    // --- Init Vanta Background ---
+    document.addEventListener("DOMContentLoaded", () => {
+      VANTA.GLOBE({
+        el: "body",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.0,
+        minWidth: 200.0,
+        scale: 1.0,
+        scaleMobile: 1.0,
+        color: 0x5a2d82,         // Purple
+        backgroundColor: 0x0a0a0a // Dark background
+      });
+    });
 
-        function createGrid() {
-            grid.innerHTML = '';
-            for(let i=0; i < TARGET_COUNT; i++) {
-                const slot = document.createElement('div');
-                slot.id = `slot-${i}`;
-                // Styled as empty terminal slots
-                slot.className = `h-20 bg-gray-900/50 border border-gray-800 rounded flex items-center justify-center text-gray-700 font-mono text-sm select-none transition-colors duration-300`;
-                slot.innerHTML = `[${(i + 1).toString().padStart(2, '0')}]`;
-                grid.appendChild(slot);
+    // --- Game Logic ---
+    const API_BASE = "https://mcsrranked.com/api/leaderboard";
+    const TARGET_COUNT = 20;
+    const FETCH_LIMIT = 1500;
+
+    // Any accepted input name (nickname OR alias) -> runner object (when known from API)
+    const nameToRunner = new Map();
+
+    // Found set stores stable keys
+    let foundIds = new Set();
+    let foundCount = 0;
+
+    let timerInterval = null;
+    let startTime = null;
+    let isGameRunning = false;
+    let isGameOver = false;
+
+    const grid = document.getElementById("grid");
+    const input = document.getElementById("runnerInput");
+    const scoreEl = document.getElementById("score");
+    const ringEl = document.getElementById("progressRing");
+    const timerEl = document.getElementById("timer");
+    const statusEl = document.getElementById("connectionStatus");
+    const poolEl = document.getElementById("poolSize");
+    const winSection = document.getElementById("winSection");
+
+    function createGrid() {
+      grid.innerHTML = "";
+      for (let i = 0; i < TARGET_COUNT; i++) {
+        const slot = document.createElement("div");
+        slot.id = `slot-${i}`;
+        slot.className =
+          "h-20 bg-gray-900/50 border border-gray-800 rounded flex items-center justify-center text-gray-700 font-mono text-sm select-none transition-colors duration-300";
+        slot.innerHTML = `[${(i + 1).toString().padStart(2, "0")}]`;
+        grid.appendChild(slot);
+      }
+    }
+
+    function formatTime(ms) {
+      const m = Math.floor(ms / 60000).toString().padStart(2, "0");
+      const s = Math.floor((ms % 60000) / 1000).toString().padStart(2, "0");
+      const mil = (ms % 1000).toString().padStart(3, "0");
+      return `${m}:${s}:${mil}`;
+    }
+
+    function startTimer() {
+      if (isGameRunning) return;
+      isGameRunning = true;
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const diff = Date.now() - startTime;
+        timerEl.textContent = formatTime(diff);
+      }, 30);
+    }
+
+    function getRunnerId(runner) {
+      // Use whatever stable id exists; otherwise nickname
+      return String(runner.uuid || runner.id || runner.userId || runner.nickname).toLowerCase();
+    }
+
+    function indexRunner(runner) {
+      if (!runner || !runner.nickname) return;
+      const key = String(runner.nickname).toLowerCase();
+      if (!nameToRunner.has(key)) nameToRunner.set(key, runner);
+    }
+
+    function pickBestDisplayName(names) {
+      // Heuristic: prefer longest entry (often the "actual" username)
+      return [...names].sort((a, b) => b.length - a.length)[0] || "Unknown";
+    }
+
+    function resolveRunnerFromInput(val) {
+      // 1) direct nickname match (from API/fallback)
+      const direct = nameToRunner.get(val);
+      if (direct) return { runner: direct, stableKey: getRunnerId(direct) };
+
+      // 2) alias group match (bm, ddb, etc.)
+      const gid = aliasToGroupId.get(val);
+      if (!gid) return null;
+
+      const groupNames = groupIdToNames.get(gid) || [];
+
+      // try any name in the group that exists in fetched data
+      for (const candidate of groupNames) {
+        const r = nameToRunner.get(candidate);
+        if (r) return { runner: r, stableKey: getRunnerId(r) };
+      }
+
+      // 3) allow alias anyway with a placeholder runner
+      // stableKey uses gid so it can't be entered twice via another alias in same group
+      const placeholderName = pickBestDisplayName(groupNames);
+      const placeholderRunner = {
+        nickname: placeholderName,
+        eloRank: "??",
+        eloRate: ""
+      };
+      return { runner: placeholderRunner, stableKey: gid };
+    }
+
+    async function fetchLeaderboard() {
+      let page = 1;
+      let hasMore = true;
+      let loadedCount = 0;
+      let usedFallback = false;
+
+      statusEl.textContent = "Fetching Data...";
+
+      try {
+        while (hasMore && loadedCount < FETCH_LIMIT) {
+          const response = await fetch(`${API_BASE}?page=${page}`);
+          const json = await response.json();
+
+          if (
+            json?.status === "success" &&
+            json?.data?.users &&
+            Array.isArray(json.data.users) &&
+            json.data.users.length > 0
+          ) {
+            json.data.users.forEach(user => indexRunner(user));
+
+            loadedCount = nameToRunner.size;
+            poolEl.textContent = `${loadedCount} Runners Loaded`;
+
+            if (json.data.users.length < 20) {
+              hasMore = false;
+            } else {
+              page++;
             }
+          } else {
+            hasMore = false;
+          }
+
+          if (page > 30) hasMore = false;
         }
 
-        async function fetchLeaderboard() {
-            let loadedCount = 0;
-            let page = 1;
-            let hasMore = true;
-            let retryFallback = false;
+        statusEl.textContent = "Online";
+        statusEl.className = "text-green-400";
+      } catch (e) {
+        console.error(e);
+        statusEl.textContent = "Offline Mode";
+        statusEl.className = "text-red-400";
+        loadFallbackData();
+        usedFallback = true;
+      }
 
-            statusEl.textContent = "Fetching Data...";
-            
-            try {
-                while(hasMore && loadedCount < FETCH_LIMIT) {
-                    const response = await fetch(`${API_BASE}?page=${page}`);
-                    const json = await response.json();
+      if (nameToRunner.size === 0 && !usedFallback) {
+        loadFallbackData();
+      }
 
-                    if(json.status === 'success' && json.data.users && json.data.users.length > 0) {
-                        json.data.users.forEach(user => {
-                            const lowerName = user.nickname.toLowerCase();
-                            if(!allRunners.has(lowerName)) {
-                                allRunners.set(lowerName, user);
-                            }
-                        });
+      input.disabled = false;
+      input.focus();
+    }
 
-                        loadedCount = allRunners.size;
-                        poolEl.textContent = `${loadedCount} Runners Loaded`;
+    function loadFallbackData() {
+      const fallbackNames = [
+        "edcr","Infume","Feinberg","bing_pigs","lowk3y_","doogile","BlazeMind","nahhann","silverrruns","Aquacorde",
+        "meebie","Watermelon1708","ChugokuPoletop","shimuon","MrBudgiee","BadGamer","BeefSalad","HDMICables",
+        "carl_CAR89","paukll","NOHACKSJUSTTIGER","steez","cornflakesmcsr","v_strid","okrzej_","iKme_","sevensix_",
+        "yjako","ulsah1n","KenanKardes","7rowl","TUDORULE","darvy_CAR89","slowunc","priffie","Ancoboyy","SuperC_",
+        "Hypn0ticMCSR","nyachloe","nEmerald","bbiddd","Ranik_","romuxii","ANJOUU","vorbh","JackoWacko62",
+        "dinonuggieboi","faluhub","novadud","Romans_8","JustAltoid","Bloonskiller","suravil","Antoo_CAR89",
+        "L9_YURILOVER21","sanjinhu","ContraVz","pavkin","danterus","Voxio","Vekp","paplerr","retropog","Erikfzf",
+        "loodlow_CAR89","ayman5","takachaaaaaaan","Kxpow","rcolee","Zylenox","_1102","rekrap2","CroProYT",
+        "fruitberries","boywithcards","Gabryll","iluappi","Ale267","leah_mp3","TheLandSharkJeff","Snakezy","misfity",
+        "karatebaby_","dandannyboy","Casssual","Pinne","Fr4nkey","hackingnoises","hsbi","Duk4n","Psemcovici",
+        "yeopgihoney","WokerLowElo","90Tom","Maraico","Starchomper","Hinart","pigswitch","MaybeSoul","m1kky_",
+        "oshgay","darkk575","aleen","b1ur_","semcomet","wethr","sylvie0616","boosterruns","thecamo6","webwormy",
+        "kohout135","dwoh","mukvl","lvckyruns","JoomzMonkey","vcfg","lumeh_CAR89","Tenes9999","KZA3","Thunderstorming",
+        "lyxier","romuu__","JebFromGameHouse","21mustard","Bodek","Rescofille","drx6","tomscaredfamrow","Mixray_",
+        "DoyPingu","LEC666888","xFray_","Waluyoshi","benemies","yuunihact","_Makke","Avzes","Tookannn","BinEin",
+        "HayaseYuuka1403","SwisDontMiss","Brunted","timmyturner79","skylewl","pandaendoz","wulpogg","nsla","GradientGray",
+        "GByeDeclaration","a4102545"
+      ];
 
-                        if(json.data.users.length < 20) { 
-                            hasMore = false; 
-                        } else {
-                            page++;
-                        }
-                    } else {
-                        hasMore = false;
-                    }
-                    if(page > 30) hasMore = false;
-                }
-                
-                statusEl.textContent = "Online";
-                statusEl.className = "text-green-400";
-                
-            } catch (e) {
-                console.error(e);
-                statusEl.textContent = "Offline Mode";
-                statusEl.className = "text-red-400";
-                loadFallbackData();
-                retryFallback = true;
-            }
+      fallbackNames.forEach((name, i) => {
+        const runner = {
+          nickname: name,
+          eloRank: i + 1,
+          eloRate: 2500 - i
+        };
+        indexRunner(runner);
+      });
 
-            if(allRunners.size === 0 && !retryFallback) {
-                loadFallbackData();
-            }
+      poolEl.textContent = `${nameToRunner.size} Runners (Local)`;
+    }
 
-            input.disabled = false;
-            input.focus();
-        }
+    function updateUI() {
+      scoreEl.textContent = foundCount;
+      const percent = foundCount / TARGET_COUNT;
+      const offset = 100 - percent * 100;
+      ringEl.style.strokeDashoffset = offset;
+    }
 
-        function loadFallbackData() {
-            const fallbackNames = ['edcr', 'Infume', 'Feinberg', 'bing_pigs', 'lowk3y_', 'doogile', 'BlazeMind', 'nahhann', 'silverrruns', 'Aquacorde', 'meebie', 'Watermelon1708', 'ChugokuPoletop', 'shimuon', 'MrBudgiee', 'BadGamer', 'BeefSalad', 'HDMICables', 'carl_CAR89', 'paukll', 'NOHACKSJUSTTIGER', 'steez', 'cornflakesmcsr', 'v_strid', 'okrzej_', 'iKme_', 'sevensix_', 'yjako', 'ulsah1n', 'KenanKardes', '7rowl', 'TUDORULE', 'darvy_CAR89', 'slowunc', 'priffie', 'Ancoboyy', 'SuperC_', 'Hypn0ticMCSR', 'nyachloe', 'nEmerald', 'bbiddd', 'Ranik_', 'romuxii', 'ANJOUU', 'vorbh', 'JackoWacko62', 'dinonuggieboi', 'faluhub', 'novadud', 'Romans_8', 'JustAltoid', 'Bloonskiller', 'suravil', 'Antoo_CAR89', 'L9_YURILOVER21', 'sanjinhu', 'ContraVz', 'pavkin', 'danterus', 'Voxio', 'Vekp', 'paplerr', 'retropog', 'Erikfzf', 'loodlow_CAR89', 'ayman5', 'takachaaaaaaan', 'Kxpow', 'rcolee', 'Zylenox', '_1102', 'rekrap2', 'CroProYT', 'fruitberries', 'boywithcards', 'Gabryll', 'iluappi', 'Ale267', 'leah_mp3', 'TheLandSharkJeff', 'Snakezy', 'misfity', 'karatebaby_', 'dandannyboy', 'Casssual', 'Pinne', 'Fr4nkey', 'hackingnoises', 'hsbi', 'Duk4n', 'Psemcovici', 'yeopgihoney', 'WokerLowElo', '90Tom', 'Maraico', 'Starchomper', 'Hinart', 'pigswitch', 'MaybeSoul', 'm1kky_', 'oshgay', 'darkk575', 'aleen', 'b1ur_', 'semcomet', 'wethr', 'sylvie0616', 'boosterruns', 'thecamo6', 'webwormy', 'kohout135', 'dwoh', 'mukvl', 'lvckyruns', 'JoomzMonkey', 'vcfg', 'lumeh_CAR89', 'Tenes9999', 'KZA3', 'Thunderstorming', 'lyxier', 'romuu__', 'JebFromGameHouse', '21mustard', 'Bodek', 'Rescofille', 'drx6', 'tomscaredfamrow', 'Mixray_', 'DoyPingu', 'LEC666888', 'xFray_', 'Waluyoshi', 'benemies', 'yuunihact', '_Makke', 'Avzes', 'Tookannn', 'BinEin', 'HayaseYuuka1403', 'SwisDontMiss', 'Brunted', 'timmyturner79', 'skylewl', 'pandaendoz', 'wulpogg', 'nsla', 'GradientGray', 'GByeDeclaration', 'a4102545'];
-            fallbackNames.forEach((name, i) => {
-                allRunners.set(name.toLowerCase(), {
-                    nickname: name,
-                    eloRank: i+1,
-                    eloRate: 2500 - i
-                });
-            });
-            poolEl.textContent = `${allRunners.size} Runners (Local)`;
-        }
+    function addRunnerToGrid(runner) {
+      if (foundCount >= TARGET_COUNT) return;
 
-        function startTimer() {
-            if(isGameRunning) return;
-            isGameRunning = true;
-            startTime = Date.now();
-            timerInterval = setInterval(() => {
-                const diff = Date.now() - startTime;
-                timerEl.textContent = formatTime(diff);
-            }, 30);
-        }
+      const slot = document.getElementById(`slot-${foundCount}`);
+      slot.className = "runner-card relative overflow-hidden rounded-md p-2 flex flex-col justify-center card-anim";
+      slot.innerHTML = `
+        <div class="text-xs text-purple-400 font-bold tracking-wider mb-0.5 border-b border-purple-900/50 pb-1">
+          #${runner.eloRank ?? "??"}
+        </div>
+        <div class="text-base md:text-lg font-bold text-gray-200 truncate w-full mt-1" title="${runner.nickname ?? ""}">
+          ${runner.nickname ?? "Unknown"}
+        </div>
+        <div class="text-[10px] text-green-600 font-mono absolute top-2 right-2">
+          ${runner.eloRate ?? ""}
+        </div>
+      `;
 
-        function formatTime(ms) {
-            const m = Math.floor(ms / 60000).toString().padStart(2, '0');
-            const s = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
-            const mil = (ms % 1000).toString().padStart(3, '0');
-            return `${m}:${s}:${mil}`;
-        }
+      foundCount++;
+      updateUI();
 
-        function checkInput() {
-            if(isGameOver) return;
-            
-            const val = input.value.trim().toLowerCase();
-            if(!val) return;
+      if (foundCount === TARGET_COUNT) endGame();
+    }
 
-            if(!isGameRunning) startTimer();
+    function endGame() {
+      isGameOver = true;
+      clearInterval(timerInterval);
 
-            if(allRunners.has(val)) {
-                const runner = allRunners.get(val);
-                
-                if(!foundIds.has(runner.nickname.toLowerCase())) {
-                    addRunnerToGrid(runner);
-                    input.value = ''; 
-                }
-            }
-        }
+      const finalTimeStr = timerEl.textContent;
+      document.getElementById("finalTime").textContent = finalTimeStr;
 
-        function addRunnerToGrid(runner) {
-            if(foundCount >= TARGET_COUNT) return;
+      input.disabled = true;
+      input.placeholder = "GG! You finished.";
 
-            foundIds.add(runner.nickname.toLowerCase());
-            
-            const slot = document.getElementById(`slot-${foundCount}`);
-            
-            // Replaced styles with the "Album Cover" aesthetic
-            slot.className = `runner-card relative overflow-hidden rounded-md p-2 flex flex-col justify-center card-anim`;
-            slot.innerHTML = `
-                <div class="text-xs text-purple-400 font-bold tracking-wider mb-0.5 border-b border-purple-900/50 pb-1">#${runner.eloRank}</div>
-                <div class="text-base md:text-lg font-bold text-gray-200 truncate w-full mt-1" title="${runner.nickname}">${runner.nickname}</div>
-                <div class="text-[10px] text-green-600 font-mono absolute top-2 right-2">${runner.eloRate}</div>
-            `;
+      winSection.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
-            foundCount++;
-            updateUI();
+    async function shareResult() {
+      const time = timerEl.textContent;
+      const text = `I solved the Ranked Player Quiz in ${time}!\nCan you name 50 runners? https://burandby.github.io/runners`;
 
-            if(foundCount === TARGET_COUNT) {
-                endGame();
-            }
-        }
+      try {
+        await navigator.clipboard.writeText(text);
+        const feedback = document.getElementById("copyFeedback");
+        feedback.classList.remove("text-green-400/0");
+        feedback.classList.add("text-green-400");
+        setTimeout(() => {
+          feedback.classList.add("text-green-400/0");
+          feedback.classList.remove("text-green-400");
+        }, 2000);
+      } catch (err) {
+        console.error("Failed to copy", err);
+        alert("Could not copy to clipboard automatically.");
+      }
+    }
 
-        function updateUI() {
-            scoreEl.textContent = foundCount;
-            const percent = foundCount / TARGET_COUNT;
-            const offset = 100 - (percent * 100);
-            ringEl.style.strokeDashoffset = offset;
-        }
+    function checkInput() {
+      if (isGameOver) return;
 
-        function endGame() {
-            isGameOver = true;
-            clearInterval(timerInterval);
-            
-            const finalTimeStr = timerEl.textContent;
-            document.getElementById('finalTime').textContent = finalTimeStr;
-            
-            input.disabled = true;
-            input.placeholder = "GG! You finished.";
-            
-            winSection.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+      const val = input.value.trim().toLowerCase();
+      if (!val) return;
 
-        async function shareResult() {
-            const time = timerEl.textContent;
-            const text = `I solved the Ranked Player Quiz in ${time}!\nCan you name 50 runners? https://burandby.github.io/runners`;
-            
-            try {
-                await navigator.clipboard.writeText(text);
-                const feedback = document.getElementById('copyFeedback');
-                feedback.classList.remove('text-green-400/0');
-                feedback.classList.add('text-green-400');
-                setTimeout(() => {
-                    feedback.classList.add('text-green-400/0');
-                    feedback.classList.remove('text-green-400');
-                }, 2000);
-            } catch (err) {
-                console.error('Failed to copy', err);
-                alert("Could not copy to clipboard automatically.");
-            }
-        }
+      if (!isGameRunning) startTimer();
 
-        input.addEventListener('input', checkInput);
+      const resolved = resolveRunnerFromInput(val);
+      if (!resolved) return;
 
-        createGrid();
-        fetchLeaderboard();
+      const { runner, stableKey } = resolved;
 
-    </script>
+      if (foundIds.has(stableKey)) return;
+
+      foundIds.add(stableKey);
+      addRunnerToGrid(runner);
+      input.value = "";
+    }
+
+    input.addEventListener("input", checkInput);
+
+    createGrid();
+    fetchLeaderboard();
+  </script>
 </body>
 </html>
