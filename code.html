@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Embed Code Renderer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Fraunces:wght@600;700&display=swap" rel="stylesheet" />
+  <link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <style>
+    :root {
+      --bg-1: #0b0c10;
+      --bg-2: #111827;
+      --bg-3: #1f2937;
+      --accent: #f59e0b;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --card: rgba(15, 23, 42, 0.75);
+      --border: rgba(148, 163, 184, 0.2);
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 10% 10%, #1d4ed8 0%, transparent 60%),
+                  radial-gradient(900px 500px at 90% 20%, #db2777 0%, transparent 55%),
+                  linear-gradient(160deg, var(--bg-1), var(--bg-2) 55%, var(--bg-3));
+      font-family: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    header {
+      padding: 32px 20px 12px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 10px;
+      font-family: "Fraunces", Georgia, serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .wrap {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: minmax(280px, 1fr);
+      padding: 16px 20px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text);
+      padding: 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text);
+      font-family: inherit;
+    }
+
+    .row {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      align-items: end;
+    }
+
+    .link-row {
+      display: grid;
+      gap: 10px;
+    }
+
+    .button {
+      appearance: none;
+      border: none;
+      background: var(--accent);
+      color: #0b0c10;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .button:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); }
+
+    .preview pre {
+      margin: 0;
+      border-radius: 14px;
+      overflow: auto;
+    }
+
+    .embed body,
+    body.embed {
+      background: #0b0c10;
+    }
+
+    body.embed header,
+    body.embed .editor {
+      display: none;
+    }
+
+    body.embed .wrap {
+      max-width: 100%;
+      padding: 0;
+    }
+
+    body.embed .card {
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      background: transparent;
+    }
+
+    .hidden { display: none; }
+
+    @media (min-width: 900px) {
+      .wrap {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Code Embed Renderer</h1>
+    <p>Paste code, pick a language, and share a link that renders with syntax highlighting.</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card editor">
+      <div class="row">
+        <div>
+          <label for="lang">Language</label>
+          <select id="lang">
+            <option value="plaintext">Plain Text</option>
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="csharp">C#</option>
+            <option value="bash">Bash</option>
+            <option value="css">CSS</option>
+            <option value="go">Go</option>
+            <option value="html">HTML</option>
+            <option value="java">Java</option>
+            <option value="javascript">JavaScript</option>
+            <option value="json">JSON</option>
+            <option value="markdown">Markdown</option>
+            <option value="php">PHP</option>
+            <option value="python">Python</option>
+            <option value="ruby">Ruby</option>
+            <option value="rust">Rust</option>
+            <option value="sql">SQL</option>
+            <option value="toml">TOML</option>
+            <option value="typescript">TypeScript</option>
+            <option value="yaml">YAML</option>
+          </select>
+        </div>
+        <div>
+          <label for="theme">Theme</label>
+          <select id="theme">
+            <option value="github-dark" selected>Github Dark</option>
+            <option value="github">Github Light</option>
+            <option value="atom-one-dark">Atom One Dark</option>
+            <option value="atom-one-light">Atom One Light</option>
+            <option value="tokyo-night-dark">Tokyo Night Dark</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <label for="code">Code</label>
+        <textarea id="code" placeholder="Paste code here..."></textarea>
+      </div>
+
+      <div class="link-row" style="margin-top: 16px;">
+        <label for="link">Shareable Link</label>
+        <input id="link" type="text" readonly />
+        <button class="button" id="copy">Copy Link</button>
+      </div>
+    </section>
+
+    <section class="card preview">
+      <pre><code id="preview" class="language-plaintext"></code></pre>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const codeParam = params.get("code") || "";
+    const langParam = params.get("lang") || "plaintext";
+    const themeParam = params.get("theme") || "github-dark";
+
+    const codeInput = document.getElementById("code");
+    const langSelect = document.getElementById("lang");
+    const themeSelect = document.getElementById("theme");
+    const linkInput = document.getElementById("link");
+    const preview = document.getElementById("preview");
+    const copyButton = document.getElementById("copy");
+    const themeLink = document.getElementById("hljs-theme");
+
+    const themeMap = {
+      "github-dark": "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css",
+      "github": "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css",
+      "atom-one-dark": "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css",
+      "atom-one-light": "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css",
+      "tokyo-night-dark": "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css"
+    };
+    const languageAliases = {
+      "c++": "cpp"
+    };
+    const languageLoads = new Map();
+
+    function setTheme(theme) {
+      themeLink.href = themeMap[theme] || themeMap["github-dark"];
+    }
+
+    function ensureLanguage(lang) {
+      if (!lang || lang === "plaintext") {
+        return Promise.resolve();
+      }
+      const normalized = languageAliases[lang] || lang;
+      if (hljs.getLanguage(normalized)) {
+        return Promise.resolve();
+      }
+      if (languageLoads.has(normalized)) {
+        return languageLoads.get(normalized);
+      }
+
+      const url = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/${normalized}.min.js`;
+      const promise = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = url;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error(`Failed to load ${normalized}`));
+        document.head.appendChild(script);
+      });
+      languageLoads.set(normalized, promise);
+      return promise;
+    }
+
+    let renderToken = 0;
+    async function updatePreview() {
+      const token = ++renderToken;
+      const code = codeInput.value;
+      const lang = langSelect.value || "plaintext";
+      preview.className = `language-${lang}`;
+      preview.textContent = code;
+      try {
+        await ensureLanguage(lang);
+      } catch (err) {
+        // Fall back to plaintext if a language pack is missing.
+      }
+      if (token !== renderToken) {
+        return;
+      }
+      hljs.highlightElement(preview);
+    }
+
+    function updateLink() {
+      const base = window.location.href.split("?")[0];
+      const code = encodeURIComponent(codeInput.value || "");
+      const lang = encodeURIComponent(langSelect.value || "plaintext");
+      const theme = encodeURIComponent(themeSelect.value || "github-dark");
+      const link = `${base}?code=${code}&lang=${lang}&theme=${theme}`;
+      linkInput.value = link;
+    }
+
+    function hydrateFromParams() {
+      if (!codeParam) {
+        return;
+      }
+
+      document.body.classList.add("embed");
+      codeInput.value = codeParam;
+      langSelect.value = langParam;
+      themeSelect.value = themeParam;
+      setTheme(themeParam);
+      updatePreview();
+    }
+
+    codeInput.addEventListener("input", () => {
+      updatePreview();
+      updateLink();
+    });
+
+    langSelect.addEventListener("change", () => {
+      updatePreview();
+      updateLink();
+    });
+
+    themeSelect.addEventListener("change", () => {
+      setTheme(themeSelect.value);
+      updatePreview();
+      updateLink();
+    });
+
+    copyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(linkInput.value);
+        copyButton.textContent = "Copied!";
+        setTimeout(() => (copyButton.textContent = "Copy Link"), 1200);
+      } catch (err) {
+        copyButton.textContent = "Copy failed";
+        setTimeout(() => (copyButton.textContent = "Copy Link"), 1200);
+      }
+    });
+
+    setTheme(themeParam);
+
+    if (codeParam) {
+      hydrateFromParams();
+    } else {
+      updatePreview();
+      updateLink();
+    }
+  </script>
+</body>
+</html>
