@@ -352,9 +352,32 @@ h1 {
       <strong>Merch:</strong> <a href="https://fulham-shop.fourthwall.com/" target="_blank" style="color: var(--neon-cyan);">fulham-shop.fourthwall.com</a></p>
     </div>
 
-    <div class="live-count">
-      <span class="live-dot"></span>
-      <span id="liveCount">Checking...</span>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+      <div class="live-count" style="margin-bottom: 0;">
+        <span class="live-dot"></span>
+        <span id="liveCount">Checking...</span>
+      </div>
+      <a id="multiTwitchBtn" href="#" target="_blank" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(187, 154, 247, 0.15);
+        border: 1px solid var(--neon-pink);
+        color: var(--neon-pink);
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-family: var(--font-ui);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        pointer-events: none;
+        opacity: 0.4;
+      " onmouseover="this.style.background='rgba(187,154,247,0.25)'" onmouseout="this.style.background='rgba(187,154,247,0.15)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+        Watch All Live
+      </a>
     </div>
 
     <div class="streamer-grid" id="streamerGrid">
@@ -506,6 +529,23 @@ async function updateStatus() {
   }
 
   liveCount.innerHTML = `${onlineCount} streamer${onlineCount !== 1 ? 's' : ''} live`;
+
+  const liveUsernames = streamers
+    .filter(s => onlineData[s.twitch.toLowerCase()])
+    .map(s => s.twitch);
+
+  const btn = document.getElementById('multiTwitchBtn');
+  if (liveUsernames.length > 0) {
+    btn.href = `https://www.multitwitch.tv/${liveUsernames.join('/')}`;
+    btn.style.pointerEvents = 'auto';
+    btn.style.opacity = '1';
+    btn.title = `Watch: ${liveUsernames.join(', ')}`;
+  } else {
+    btn.href = '#';
+    btn.style.pointerEvents = 'none';
+    btn.style.opacity = '0.4';
+    btn.title = '';
+  }
 
   const now = new Date();
   document.getElementById('lastUpdate').textContent = 
