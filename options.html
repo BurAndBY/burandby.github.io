@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minecraft Settings Converter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0a0c;
+  --bg-glass: rgba(20, 20, 30, 0.65);
+  --bg-glass-hover: rgba(30, 30, 45, 0.75);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --neon-blue: #7aa2f7;
+  --neon-cyan: #2ac3de;
+  --neon-pink: #bb9af7;
+  --neon-green: #9ece6a;
+  --neon-red: #f7768e;
+  --neon-yellow: #e0af68;
+  --text-main: #c0caf5;
+  --text-muted: #565f89;
+  --font-code: 'JetBrains Mono', monospace;
+  --font-ui: 'Outfit', sans-serif;
+  --terminal-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-muted) transparent;
+}
+
+body {
+  background-color: var(--bg-deep);
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(122, 162, 247, 0.08), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(187, 154, 247, 0.08), transparent 25%);
+  color: var(--text-main);
+  font-family: var(--font-code);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 2;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+.terminal-window {
+  width: 100%;
+  max-width: 1380px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  box-shadow: var(--terminal-shadow), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  animation: bootUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bootUp {
+  from { opacity: 0; transform: scale(0.95) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.title-bar {
+  height: 40px;
+  background: rgba(10, 10, 12, 0.5);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  justify-content: space-between;
+}
+
+.window-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.control {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.close { background: #ff5f56; }
+.minimize { background: #ffbd2e; }
+.maximize { background: #27c93f; }
+
+.title-text {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.editor {
+  flex: 1;
+  padding: 30px 40px;
+  overflow-y: auto;
+  max-height: calc(100vh - 112px);
+}
+
+h1 {
+  font-family: var(--font-ui);
+  font-size: 2.1rem;
+  color: var(--neon-cyan);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 25px;
+  line-height: 1.6;
+  max-width: 880px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 7px 14px;
+  border: 1px solid transparent;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.pill.live {
+  background: rgba(158, 206, 106, 0.15);
+  border-color: var(--neon-green);
+}
+
+.pill.detected {
+  background: rgba(122, 162, 247, 0.15);
+  border-color: var(--neon-blue);
+}
+
+.pill.warning {
+  background: rgba(224, 175, 104, 0.14);
+  border-color: var(--neon-yellow);
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--neon-green);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+.info-box {
+  background: rgba(122, 162, 247, 0.1);
+  border-left: 3px solid var(--neon-blue);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 0 6px 6px 0;
+}
+
+.info-box p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.info-box a {
+  color: var(--neon-cyan);
+}
+
+.footer-gif {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+
+.footer-gif.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.footer-gif img {
+  max-width: min(100%, 360px);
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.panel h2,
+.panel h3 {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+label {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+select,
+input[type="file"],
+textarea {
+  width: 100%;
+  border: 1px solid var(--border-glass);
+  background: rgba(8, 8, 12, 0.55);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: var(--font-code);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+select:focus,
+input[type="file"]:focus,
+textarea:focus {
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 0 3px rgba(122, 162, 247, 0.18);
+  background: rgba(12, 12, 18, 0.85);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 430px;
+  line-height: 1.45;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+button {
+  border: 1px solid var(--border-glass);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-family: var(--font-ui);
+  font-size: 0.87rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  border-color: var(--neon-blue);
+  background: rgba(122, 162, 247, 0.12);
+}
+
+button.primary {
+  border-color: var(--neon-cyan);
+  background: rgba(42, 195, 222, 0.14);
+  color: var(--neon-cyan);
+}
+
+button.primary:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+button.secondary {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  background: rgba(187, 154, 247, 0.14);
+}
+
+button.success {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  background: rgba(158, 206, 106, 0.12);
+}
+
+button.warn {
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+  background: rgba(224, 175, 104, 0.12);
+}
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mini-badge {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  border: 1px solid var(--border-glass);
+  padding: 5px 8px;
+  border-radius: 999px;
+}
+
+.warnings-list {
+  display: grid;
+  gap: 10px;
+  max-height: 270px;
+  overflow: auto;
+}
+
+.warning-item {
+  border: 1px solid var(--border-glass);
+  border-left: 3px solid var(--neon-yellow);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.warning-item.error {
+  border-left-color: var(--neon-red);
+}
+
+.warning-item strong {
+  color: var(--text-main);
+}
+
+.mapping-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stat-card {
+  border: 1px solid var(--border-glass);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.stat-card .label {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+}
+
+.stat-card .value {
+  font-family: var(--font-ui);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.status-line {
+  height: 32px;
+  background: var(--neon-blue);
+  color: var(--bg-deep);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.mode {
+  background: #fff;
+  padding: 2px 8px;
+  margin-right: 10px;
+}
+
+@media (max-width: 1024px) {
+  .controls-grid,
+  .editor-grid,
+  .mapping-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  body { padding: 0; }
+  .terminal-window { border-radius: 0; border: none; max-width: 100%; }
+  .editor { padding: 20px; max-height: calc(100vh - 72px); }
+  h1 { font-size: 1.65rem; }
+  .form-grid { grid-template-columns: 1fr; }
+  textarea { min-height: 320px; }
+}
+</style>
+</head>
+<body>
+<div class="terminal-window">
+  <div class="title-bar">
+    <div class="window-controls">
+      <div class="control close"></div>
+      <div class="control minimize"></div>
+      <div class="control maximize"></div>
+    </div>
+    <div class="title-text">minecraft_options_converter.html — nvim</div>
+    <div class="title-text" id="topStatus">ready</div>
+  </div>
+
+  <div class="editor">
+    <h1>Minecraft Settings Converter</h1>
+    <p class="subtitle">
+      Convert between legacy <code>options.txt</code>, modern <code>options.txt</code>, and
+      <code>standardsettings.json</code> using the exact sample files in this folder as templates.
+      The converter is best-effort for nearby versions and shows warnings when a value cannot be represented cleanly.
+    </p>
+
+    <div class="toolbar">
+      <div class="pill live"><span class="live-dot"></span><span id="convertStatus">Idle</span></div>
+      <div class="pill detected"><span>Detected:</span><span id="detectedFormat">unknown</span></div>
+      <div class="pill warning"><span>Warnings:</span><span id="warningCount">0</span></div>
+    </div>
+
+    <div class="controls-grid">
+      <div class="panel">
+        <h2>Conversion Controls</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label for="targetFormat">Target Format</label>
+            <select id="targetFormat">
+              <option value="old-txt">Old options.txt (1.9-style)</option>
+              <option value="modern-txt">Modern options.txt (26.1-style)</option>
+              <option value="standardsettings-json">DefaultSettings JSON (1.16.1-style)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="loadExample">Example Input</label>
+            <select id="loadExample">
+              <option value="">Choose an example…</option>
+              <option value="old-txt">Load 1.9_default.txt</option>
+              <option value="modern-txt">Load 26.1_default.txt</option>
+              <option value="standardsettings-json">Load 1.16.1_standardsettings.json</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="fileInput">Open Local File</label>
+            <input id="fileInput" type="file" accept=".txt,.json,text/plain,application/json">
+          </div>
+        </div>
+
+        <div class="button-row" style="margin-top: 14px;">
+          <button id="detectBtn" class="secondary" type="button">Detect</button>
+          <button id="convertBtn" class="primary" type="button">Convert</button>
+          <button id="swapBtn" class="warn" type="button">Swap</button>
+          <button id="loadBtn" class="success" type="button">Load Example</button>
+          <button id="downloadBtn" type="button">Download Output</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Conversion Summary</h2>
+        <div class="mapping-summary">
+          <div class="stat-card">
+            <div class="label">Mapped Keys</div>
+            <div class="value" id="mappedCount">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Defaulted Keys</div>
+            <div class="value" id="defaultedCount">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Passthrough Keys</div>
+            <div class="value" id="passthroughCount">0</div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top: 14px; padding: 12px;">
+          <h3 style="margin-bottom: 10px;">Warnings</h3>
+          <div id="warningsList" class="warnings-list">
+            <div class="warning-item">
+              Conversion warnings and dropped-field notes will appear here.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Source</h2>
+          <div class="mini-badge" id="sourceMeta">Paste a file to begin</div>
+        </div>
+        <textarea id="sourceText" spellcheck="false" placeholder="Paste options.txt or standardsettings.json here..."></textarea>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Output</h2>
+          <div class="mini-badge" id="outputMeta">No conversion yet</div>
+        </div>
+        <textarea id="outputText" spellcheck="false" placeholder="Converted output appears here..."></textarea>
+      </div>
+    </div>
+
+    <div class="footer-gif">
+      <img src="https://i.nuuls.com/3-Sip.gif" alt="Animated footer image">
+    </div>
+  </div>
+
+  <div class="status-line">
+    <div>
+      <span class="mode">NORMAL</span>
+      <span>mc_settings_converter v1.0</span>
+    </div>
+    <div>
+      <span id="lastUpdate">Last action: --:--:--</span>
+    </div>
+  </div>
+</div>
+<script>
+const SAMPLE_TEXT = {
+  "old-txt": `invertYMouse:false
+mouseSensitivity:0.5
+fov:1.0
+gamma:0.0
+saturation:0.0
+renderDistance:12
+guiScale:0
+particles:0
+bobView:true
+anaglyph3d:false
+maxFps:120
+fboEnable:true
+difficulty:2
+fancyGraphics:true
+ao:2
+renderClouds:true
+resourcePacks:[]
+incompatibleResourcePacks:[]
+lastServer:
+lang:en_US
+chatVisibility:0
+chatColors:true
+chatLinks:true
+chatLinksPrompt:true
+chatOpacity:1.0
+snooperEnabled:true
+fullscreen:false
+enableVsync:true
+useVbo:false
+hideServerAddress:false
+advancedItemTooltips:false
+pauseOnLostFocus:true
+touchscreen:false
+overrideWidth:0
+overrideHeight:0
+heldItemTooltips:true
+chatHeightFocused:1.0
+chatHeightUnfocused:0.44366196
+chatScale:1.0
+chatWidth:1.0
+showInventoryAchievementHint:true
+mipmapLevels:4
+forceUnicodeFont:false
+reducedDebugInfo:false
+useNativeTransport:true
+entityShadows:true
+mainHand:right
+attackIndicator:0
+showSubtitles:false
+realmsNotifications:true
+key_key.attack:-100
+key_key.use:-99
+key_key.forward:17
+key_key.left:30
+key_key.back:31
+key_key.right:32
+key_key.jump:57
+key_key.sneak:42
+key_key.sprint:29
+key_key.drop:16
+key_key.inventory:18
+key_key.chat:20
+key_key.playerlist:15
+key_key.pickItem:-98
+key_key.command:53
+key_key.screenshot:60
+key_key.togglePerspective:63
+key_key.smoothCamera:0
+key_key.fullscreen:87
+key_key.spectatorOutlines:0
+key_key.swapHands:33
+key_key.hotbar.1:2
+key_key.hotbar.2:3
+key_key.hotbar.3:4
+key_key.hotbar.4:5
+key_key.hotbar.5:6
+key_key.hotbar.6:7
+key_key.hotbar.7:8
+key_key.hotbar.8:9
+key_key.hotbar.9:10
+soundCategory_master:1.0
+soundCategory_music:1.0
+soundCategory_record:1.0
+soundCategory_weather:1.0
+soundCategory_block:1.0
+soundCategory_hostile:1.0
+soundCategory_neutral:1.0
+soundCategory_player:1.0
+soundCategory_ambient:1.0
+soundCategory_voice:1.0
+modelPart_cape:true
+modelPart_jacket:true
+modelPart_left_sleeve:true
+modelPart_right_sleeve:true
+modelPart_left_pants_leg:true
+modelPart_right_pants_leg:true
+modelPart_hat:true`,
+  "modern-txt": `version:4790
+ao:true
+biomeBlendRadius:2
+chunkSectionFadeInTime:0.75
+cutoutLeaves:true
+enableVsync:true
+entityDistanceScaling:1.0
+entityShadows:true
+forceUnicodeFont:false
+japaneseGlyphVariants:false
+fov:0.0
+fovEffectScale:1.0
+darknessEffectScale:1.0
+glintSpeed:0.5
+glintStrength:0.75
+graphicsPreset:"fancy"
+prioritizeChunkUpdates:1
+fullscreen:false
+exclusiveFullscreen:false
+gamma:0.5
+guiScale:0
+maxAnisotropyBit:1
+textureFiltering:1
+maxFps:120
+improvedTransparency:false
+inactivityFpsLimit:"afk"
+mipmapLevels:4
+narrator:0
+particles:0
+reducedDebugInfo:false
+renderClouds:"true"
+cloudRange:64
+renderDistance:16
+simulationDistance:12
+screenEffectScale:1.0
+soundDevice:""
+vignette:true
+weatherRadius:10
+autoJump:false
+rotateWithMinecart:false
+operatorItemsTab:false
+autoSuggestions:true
+chatColors:true
+chatLinks:true
+chatLinksPrompt:true
+discrete_mouse_scroll:false
+invertXMouse:false
+invertYMouse:false
+realmsNotifications:true
+showSubtitles:false
+directionalAudio:false
+touchscreen:false
+bobView:true
+toggleCrouch:false
+toggleSprint:false
+toggleAttack:false
+toggleUse:false
+sprintWindow:7
+darkMojangStudiosBackground:false
+hideLightningFlashes:false
+hideSplashTexts:false
+mouseSensitivity:0.5
+damageTiltStrength:1.0
+highContrast:false
+highContrastBlockOutline:false
+narratorHotkey:true
+resourcePacks:[]
+incompatibleResourcePacks:[]
+lastServer:
+lang:en_us
+chatVisibility:0
+chatOpacity:1.0
+chatLineSpacing:0.0
+textBackgroundOpacity:0.5
+backgroundForChatOnly:true
+hideServerAddress:false
+advancedItemTooltips:false
+pauseOnLostFocus:true
+overrideWidth:0
+overrideHeight:0
+chatHeightFocused:1.0
+chatDelay:0.0
+chatHeightUnfocused:0.4375
+chatScale:1.0
+chatWidth:1.0
+notificationDisplayTime:1.0
+useNativeTransport:true
+mainHand:"right"
+attackIndicator:1
+tutorialStep:movement
+mouseWheelSensitivity:1.0
+rawMouseInput:true
+allowCursorChanges:true
+glDebugVerbosity:1
+skipMultiplayerWarning:false
+hideMatchedNames:true
+joinedFirstServer:false
+syncChunkWrites:true
+showAutosaveIndicator:true
+allowServerListing:true
+onlyShowSecureChat:false
+saveChatDrafts:false
+panoramaScrollSpeed:1.0
+telemetryOptInExtra:false
+onboardAccessibility:false
+menuBackgroundBlurriness:5
+startedCleanly:true
+musicToast:"never"
+musicFrequency:"DEFAULT"
+key_key.attack:key.mouse.left
+key_key.use:key.mouse.right
+key_key.forward:key.keyboard.w
+key_key.left:key.keyboard.a
+key_key.back:key.keyboard.s
+key_key.right:key.keyboard.d
+key_key.jump:key.keyboard.space
+key_key.sneak:key.keyboard.left.shift
+key_key.sprint:key.keyboard.left.control
+key_key.drop:key.keyboard.q
+key_key.inventory:key.keyboard.e
+key_key.chat:key.keyboard.t
+key_key.playerlist:key.keyboard.tab
+key_key.pickItem:key.mouse.middle
+key_key.command:key.keyboard.slash
+key_key.socialInteractions:key.keyboard.p
+key_key.toggleGui:key.keyboard.f1
+key_key.toggleSpectatorShaderEffects:key.keyboard.f4
+key_key.screenshot:key.keyboard.f2
+key_key.togglePerspective:key.keyboard.f5
+key_key.smoothCamera:key.keyboard.unknown
+key_key.fullscreen:key.keyboard.f11
+key_key.spectatorOutlines:key.keyboard.unknown
+key_key.spectatorHotbar:key.mouse.middle
+key_key.swapOffhand:key.keyboard.f
+key_key.saveToolbarActivator:key.keyboard.c
+key_key.loadToolbarActivator:key.keyboard.x
+key_key.advancements:key.keyboard.l
+key_key.quickActions:key.keyboard.g
+key_key.debug.overlay:key.keyboard.f3
+key_key.debug.modifier:key.keyboard.f3
+key_key.hotbar.1:key.keyboard.1
+key_key.hotbar.2:key.keyboard.2
+key_key.hotbar.3:key.keyboard.3
+key_key.hotbar.4:key.keyboard.4
+key_key.hotbar.5:key.keyboard.5
+key_key.hotbar.6:key.keyboard.6
+key_key.hotbar.7:key.keyboard.7
+key_key.hotbar.8:key.keyboard.8
+key_key.hotbar.9:key.keyboard.9
+key_key.debug.reloadChunk:key.keyboard.a
+key_key.debug.showHitboxes:key.keyboard.b
+key_key.debug.clearChat:key.keyboard.d
+key_key.debug.crash:key.keyboard.c
+key_key.debug.showChunkBorders:key.keyboard.g
+key_key.debug.showAdvancedTooltips:key.keyboard.h
+key_key.debug.copyRecreateCommand:key.keyboard.i
+key_key.debug.spectate:key.keyboard.n
+key_key.debug.switchGameMode:key.keyboard.f4
+key_key.debug.debugOptions:key.keyboard.f6
+key_key.debug.focusPause:key.keyboard.p
+key_key.debug.dumpDynamicTextures:key.keyboard.s
+key_key.debug.reloadResourcePacks:key.keyboard.t
+key_key.debug.profiling:key.keyboard.l
+key_key.debug.copyLocation:key.keyboard.c
+key_key.debug.dumpVersion:key.keyboard.v
+key_key.debug.profilingChart:key.keyboard.1
+key_key.debug.fpsCharts:key.keyboard.2
+key_key.debug.networkCharts:key.keyboard.3
+key_key.debug.lightmapTexture:key.keyboard.4
+soundCategory_master:1.0
+soundCategory_music:1.0
+soundCategory_record:1.0
+soundCategory_weather:1.0
+soundCategory_block:1.0
+soundCategory_hostile:1.0
+soundCategory_neutral:1.0
+soundCategory_player:1.0
+soundCategory_ambient:1.0
+soundCategory_voice:1.0
+soundCategory_ui:1.0
+modelPart_cape:true
+modelPart_jacket:true
+modelPart_left_sleeve:true
+modelPart_right_sleeve:true
+modelPart_left_pants_leg:true
+modelPart_right_pants_leg:true
+modelPart_hat:true`,
+  "standardsettings-json": `{
+  ".apiVersion": "2.1+1.16.1",
+  ".modVersion": "2.3+1.16.1",
+  ".dataVersion": 0,
+  "fov": 110.0,
+  "realmsNotifications": true,
+  "fullscreenResolution": null,
+  "biomeBlendRadius": 0.0,
+  "graphicsMode": 0,
+  "renderDistance": 12.0,
+  "ao": 0,
+  "maxFps": 250.0,
+  "enableVsync": false,
+  "bobView": true,
+  "guiScale": {
+    "enabled": false,
+    "value": 0
+  },
+  "attackIndicator": 1,
+  "gamma": 5.0,
+  "renderClouds": 0,
+  "fullscreen": false,
+  "particles": 2,
+  "mipmapLevels": 0.0,
+  "entityShadows": true,
+  "entityDistanceScaling": 5.0,
+  "entityCulling": false,
+  "modelPart_cape": true,
+  "modelPart_jacket": true,
+  "modelPart_left_sleeve": true,
+  "modelPart_right_sleeve": true,
+  "modelPart_left_pants_leg": true,
+  "modelPart_right_pants_leg": true,
+  "modelPart_hat": true,
+  "mainHand": 1,
+  "soundCategory_master": 0.116071425,
+  "soundCategory_music": 0.0,
+  "soundCategory_record": 1.0,
+  "soundCategory_weather": 1.0,
+  "soundCategory_block": 1.0,
+  "soundCategory_hostile": 1.0,
+  "soundCategory_neutral": 1.0,
+  "soundCategory_player": 1.0,
+  "soundCategory_ambient": 1.0,
+  "soundCategory_voice": 1.0,
+  "showSubtitles": true,
+  "language": {
+    "enabled": false,
+    "value": "be_by"
+  },
+  "forceUnicodeFont": {
+    "enabled": false,
+    "value": true
+  },
+  "mouseSensitivity": 0.08638528,
+  "invertYMouse": false,
+  "mouseWheelSensitivity": 1.0,
+  "discrete_mouse_scroll": false,
+  "touchscreen": false,
+  "rawMouseInput": true,
+  "autoJump": false,
+  "key_key.jump": "key.keyboard.space",
+  "key_key.sneak": "key.keyboard.left.shift",
+  "key_key.sprint": "key.keyboard.left.control",
+  "key_key.left": "key.keyboard.a",
+  "key_key.right": "key.keyboard.d",
+  "key_key.back": "key.keyboard.s",
+  "key_key.forward": "key.keyboard.w",
+  "key_key.attack": "key.mouse.left",
+  "key_key.pickItem": "key.mouse.middle",
+  "key_key.use": "key.mouse.right",
+  "key_key.drop": "key.keyboard.q",
+  "key_key.hotbar.1": "key.keyboard.1",
+  "key_key.hotbar.2": "key.keyboard.2",
+  "key_key.hotbar.3": "key.keyboard.3",
+  "key_key.hotbar.4": "key.keyboard.4",
+  "key_key.hotbar.5": "key.keyboard.5",
+  "key_key.hotbar.6": "key.keyboard.z",
+  "key_key.hotbar.7": "key.keyboard.x",
+  "key_key.hotbar.8": "key.keyboard.c",
+  "key_key.hotbar.9": "key.keyboard.v",
+  "key_key.inventory": "key.keyboard.backspace",
+  "key_key.swapOffhand": "key.keyboard.f",
+  "key_key.loadToolbarActivator": "key.keyboard.grave.accent",
+  "key_key.saveToolbarActivator": "key.keyboard.n",
+  "key_key.playerlist": "key.keyboard.tab",
+  "key_key.chat": "key.keyboard.t",
+  "key_key.command": "key.keyboard.slash",
+  "key_key.advancements": "key.keyboard.l",
+  "key_key.spectatorOutlines": "key.keyboard.unknown",
+  "key_key.screenshot": "key.keyboard.f2",
+  "key_key.smoothCamera": "key.keyboard.unknown",
+  "key_key.fullscreen": "key.keyboard.f11",
+  "key_key.togglePerspective": "key.keyboard.r",
+  "key_Create New World": "key.keyboard.f6",
+  "key_speedrunigt.controls.start_timer": "key.keyboard.u",
+  "key_speedrunigt.controls.stop_timer": "key.keyboard.i",
+  "chatVisibility": 0,
+  "chatColors": true,
+  "chatLinks": true,
+  "chatLinksPrompt": true,
+  "chatOpacity": 1.0,
+  "textBackgroundOpacity": 0.0,
+  "chatScale": 0.53125,
+  "chatLineSpacing": 0.0,
+  "chatWidth": 1.0,
+  "chatHeightFocused": 1.0,
+  "chatHeightUnfocused": 0.44366195797920227,
+  "narrator": 0,
+  "autoSuggestions": true,
+  "reducedDebugInfo": false,
+  "backgroundForChatOnly": 1,
+  "chatDelay": 0.0,
+  "toggleCrouch": 0,
+  "toggleSprint": 0,
+  "pauseOnLostFocus": true,
+  "advancedItemTooltips": false,
+  "hitboxes": {
+    "enabled": false,
+    "value": false
+  },
+  "chunkborders": {
+    "enabled": false,
+    "value": false
+  },
+  "pieDirectory": "root.gameRenderer.entities",
+  "perspective": {
+    "enabled": false,
+    "value": 0
+  },
+  "f1": {
+    "enabled": false,
+    "value": false
+  },
+  "sneaking": {
+    "enabled": false,
+    "value": false
+  },
+  "sprinting": {
+    "enabled": false,
+    "value": false
+  },
+  "fovOnWorldJoin": {
+    "enabled": false,
+    "value": 110.0
+  },
+  "renderDistanceOnWorldJoin": 5.0,
+  "entityDistanceScalingOnWorldJoin": 0.5,
+  "guiScaleOnWorldJoin": {
+    "enabled": false,
+    "value": 0
+  },
+  "toggleStandardSettings": true,
+  "toggleAll": true,
+  "autoF3Esc": false,
+  "firstAutoF3EscDelay": 22,
+  "triggerOnResize": false
+}`
+};
+
+const TEMPLATE_FILES = {
+  "old-txt": "options.txt",
+  "modern-txt": "options.txt",
+  "standardsettings-json": "standardsettings.json"
+};
+
+const TXT_ALIAS_TO_CANONICAL = {
+  lang: "language",
+  "key_key.swapHands": "key_key.swapOffhand",
+  fancyGraphics: "graphicsPreset"
+};
+
+const JSON_ALIAS_TO_CANONICAL = {
+  language: "language",
+  forceUnicodeFont: "forceUnicodeFont",
+  guiScale: "guiScale",
+  perspective: "perspective"
+};
+
+const LEGACY_KEYCODES = {
+  "-100": "key.mouse.left",
+  "-99": "key.mouse.right",
+  "-98": "key.mouse.middle",
+  "0": "key.keyboard.unknown",
+  "1": "key.keyboard.escape",
+  "2": "key.keyboard.1",
+  "3": "key.keyboard.2",
+  "4": "key.keyboard.3",
+  "5": "key.keyboard.4",
+  "6": "key.keyboard.5",
+  "7": "key.keyboard.6",
+  "8": "key.keyboard.7",
+  "9": "key.keyboard.8",
+  "10": "key.keyboard.9",
+  "11": "key.keyboard.0",
+  "14": "key.keyboard.backspace",
+  "15": "key.keyboard.tab",
+  "16": "key.keyboard.q",
+  "17": "key.keyboard.w",
+  "18": "key.keyboard.e",
+  "19": "key.keyboard.r",
+  "20": "key.keyboard.t",
+  "21": "key.keyboard.y",
+  "22": "key.keyboard.u",
+  "23": "key.keyboard.i",
+  "24": "key.keyboard.o",
+  "25": "key.keyboard.p",
+  "28": "key.keyboard.enter",
+  "29": "key.keyboard.left.control",
+  "30": "key.keyboard.a",
+  "31": "key.keyboard.s",
+  "32": "key.keyboard.d",
+  "33": "key.keyboard.f",
+  "34": "key.keyboard.g",
+  "35": "key.keyboard.h",
+  "36": "key.keyboard.j",
+  "37": "key.keyboard.k",
+  "38": "key.keyboard.l",
+  "39": "key.keyboard.semicolon",
+  "40": "key.keyboard.apostrophe",
+  "41": "key.keyboard.grave.accent",
+  "42": "key.keyboard.left.shift",
+  "43": "key.keyboard.backslash",
+  "44": "key.keyboard.z",
+  "45": "key.keyboard.x",
+  "46": "key.keyboard.c",
+  "47": "key.keyboard.v",
+  "48": "key.keyboard.b",
+  "49": "key.keyboard.n",
+  "50": "key.keyboard.m",
+  "51": "key.keyboard.comma",
+  "52": "key.keyboard.period",
+  "53": "key.keyboard.slash",
+  "54": "key.keyboard.right.shift",
+  "57": "key.keyboard.space",
+  "59": "key.keyboard.f1",
+  "60": "key.keyboard.f2",
+  "61": "key.keyboard.f3",
+  "62": "key.keyboard.f4",
+  "63": "key.keyboard.f5",
+  "64": "key.keyboard.f6",
+  "65": "key.keyboard.f7",
+  "66": "key.keyboard.f8",
+  "67": "key.keyboard.f9",
+  "68": "key.keyboard.f10",
+  "87": "key.keyboard.f11"
+};
+
+const MODERN_TO_LEGACY = Object.fromEntries(
+  Object.entries(LEGACY_KEYCODES).map(([legacy, modern]) => [modern, legacy])
+);
+
+const TARGET_LABELS = {
+  "old-txt": "Old options.txt",
+  "modern-txt": "Modern options.txt",
+  "standardsettings-json": "DefaultSettings JSON"
+};
+
+function parseOptionsTxt(text, formatHint = "unknown") {
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
+  const entries = {};
+  const order = [];
+  const warnings = [];
+  let invalidLines = 0;
+
+  lines.forEach((line, index) => {
+    if (!line.trim()) return;
+    const separator = line.indexOf(":");
+    if (separator === -1) {
+      invalidLines += 1;
+      warnings.push({ level: "error", message: `Line ${index + 1} has no ":" separator and was ignored.`, key: null });
+      return;
+    }
+    const key = line.slice(0, separator).trim();
+    const value = line.slice(separator + 1);
+    if (!key) {
+      invalidLines += 1;
+      warnings.push({ level: "error", message: `Line ${index + 1} has an empty key and was ignored.`, key: null });
+      return;
+    }
+    if (!order.includes(key)) {
+      order.push(key);
+    } else {
+      warnings.push({ level: "warn", message: `Duplicate key "${key}" found on line ${index + 1}; last value wins.`, key });
+    }
+    entries[key] = value;
+  });
+
+  return { format: formatHint, rawText: text, raw: entries, order, warnings, invalidLines };
+}
+
+function parseStandardSettingsJson(text) {
+  const parsed = JSON.parse(text);
+  return { format: "standardsettings-json", rawText: text, raw: parsed, order: Object.keys(parsed), warnings: [], invalidLines: 0 };
+}
+
+const TEMPLATE_PARSED = {
+  "old-txt": parseOptionsTxt(SAMPLE_TEXT["old-txt"], "old-txt"),
+  "modern-txt": parseOptionsTxt(SAMPLE_TEXT["modern-txt"], "modern-txt"),
+  "standardsettings-json": parseStandardSettingsJson(SAMPLE_TEXT["standardsettings-json"])
+};
+
+const state = { parsed: null, lastResult: null };
+
+const el = {
+  sourceText: document.getElementById("sourceText"),
+  outputText: document.getElementById("outputText"),
+  targetFormat: document.getElementById("targetFormat"),
+  loadExample: document.getElementById("loadExample"),
+  fileInput: document.getElementById("fileInput"),
+  detectBtn: document.getElementById("detectBtn"),
+  convertBtn: document.getElementById("convertBtn"),
+  swapBtn: document.getElementById("swapBtn"),
+  loadBtn: document.getElementById("loadBtn"),
+  downloadBtn: document.getElementById("downloadBtn"),
+  detectedFormat: document.getElementById("detectedFormat"),
+  warningCount: document.getElementById("warningCount"),
+  warningsList: document.getElementById("warningsList"),
+  mappedCount: document.getElementById("mappedCount"),
+  defaultedCount: document.getElementById("defaultedCount"),
+  passthroughCount: document.getElementById("passthroughCount"),
+  sourceMeta: document.getElementById("sourceMeta"),
+  outputMeta: document.getElementById("outputMeta"),
+  convertStatus: document.getElementById("convertStatus"),
+  topStatus: document.getElementById("topStatus"),
+  lastUpdate: document.getElementById("lastUpdate")
+};
+
+function detectFormat(text) {
+  const trimmed = text.trim();
+  if (!trimmed) return "unknown";
+
+  if (trimmed.startsWith("{")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed === "object") return "standardsettings-json";
+    } catch (error) {
+      return "unknown";
+    }
+  }
+
+  const parsed = parseOptionsTxt(text);
+  const keys = Object.keys(parsed.raw);
+  const values = Object.values(parsed.raw);
+  const modernSignals = ["version", "graphicsPreset", "simulationDistance", "soundCategory_ui", "key_key.socialInteractions"];
+
+  if (
+    keys.some((key) => modernSignals.includes(key)) ||
+    values.some((value) => /^key\.(keyboard|mouse)\./.test(String(value))) ||
+    values.some((value) => /^".*"$/.test(String(value)))
+  ) {
+    return "modern-txt";
+  }
+
+  return "old-txt";
+}
+
+function safeParseSource(text) {
+  const detected = detectFormat(text);
+  if (detected === "unknown") {
+    return {
+      format: "unknown",
+      rawText: text,
+      raw: {},
+      order: [],
+      warnings: [{ level: "error", message: "Could not detect input format.", key: null }],
+      invalidLines: 0
+    };
+  }
+
+  try {
+    return detected === "standardsettings-json" ? parseStandardSettingsJson(text) : parseOptionsTxt(text, detected);
+  } catch (error) {
+    return {
+      format: detected,
+      rawText: text,
+      raw: {},
+      order: [],
+      warnings: [{ level: "error", message: `Parse failed: ${error.message}`, key: null }],
+      invalidLines: 0
+    };
+  }
+}
+
+function normalizeBoolean(value) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  const raw = String(value).trim().replace(/^"(.*)"$/, "$1").toLowerCase();
+  if (["true", "1", "yes", "on"].includes(raw)) return true;
+  if (["false", "0", "no", "off"].includes(raw)) return false;
+  return null;
+}
+
+function normalizeNumber(value) {
+  if (typeof value === "number") return value;
+  if (typeof value !== "string") return null;
+  if (!value.trim()) return null;
+  const num = Number(value.replace(/^"(.*)"$/, "$1"));
+  return Number.isFinite(num) ? num : null;
+}
+
+function unquote(value) {
+  if (typeof value !== "string") return value;
+  if (/^".*"$/.test(value)) return value.slice(1, -1);
+  return value;
+}
+
+function graphicsModeToPreset(value) {
+  const num = Number(value);
+  if (num === 2) return "fabulous";
+  if (num === 1) return "fast";
+  return "fancy";
+}
+
+function presetToGraphicsMode(value) {
+  const preset = String(value).toLowerCase();
+  if (preset === "fabulous") return 2;
+  if (preset === "fast") return 1;
+  return 0;
+}
+
+function cloudsModeToModern(value) {
+  const num = Number(value);
+  if (num === 2) return "false";
+  if (num === 1) return "fast";
+  return "true";
+}
+
+function modernToCloudsMode(value) {
+  if (value === true) return 0;
+  const normalized = String(value).toLowerCase();
+  if (normalized === "false" || normalized === "off") return 2;
+  if (normalized === "fast") return 1;
+  return 0;
+}
+
+function buildTargetTemplate(format) {
+  const template = TEMPLATE_PARSED[format];
+  if (format === "standardsettings-json") return JSON.parse(JSON.stringify(template.raw));
+  return { ...template.raw };
+}
+
+function getTemplateOrder(format) {
+  return TEMPLATE_PARSED[format].order.slice();
+}
+
+function toCanonical(parsed) {
+  const canonical = {};
+  const warnings = [];
+
+  if (parsed.format === "standardsettings-json") {
+    for (const [key, value] of Object.entries(parsed.raw)) {
+      if (key.startsWith(".")) continue;
+      if (JSON_ALIAS_TO_CANONICAL[key] === "language" && value && typeof value === "object") {
+        canonical.language = value.value;
+        canonical.language_enabled = value.enabled;
+        continue;
+      }
+      if (JSON_ALIAS_TO_CANONICAL[key] === "forceUnicodeFont" && value && typeof value === "object") {
+        canonical.forceUnicodeFont = value.value;
+        canonical.forceUnicodeFont_enabled = value.enabled;
+        continue;
+      }
+      if (JSON_ALIAS_TO_CANONICAL[key] === "guiScale" && value && typeof value === "object") {
+        canonical.guiScale = value.value;
+        canonical.guiScale_enabled = value.enabled;
+        continue;
+      }
+      if (JSON_ALIAS_TO_CANONICAL[key] === "perspective" && value && typeof value === "object") {
+        canonical.perspective = value.value;
+        canonical.perspective_enabled = value.enabled;
+        continue;
+      }
+      canonical[key] = value;
+    }
+
+    if ("mainHand" in canonical) canonical.mainHand = Number(canonical.mainHand) === 0 ? "left" : "right";
+    if ("backgroundForChatOnly" in canonical) canonical.backgroundForChatOnly = Boolean(Number(canonical.backgroundForChatOnly));
+    if ("toggleCrouch" in canonical) canonical.toggleCrouch = Boolean(Number(canonical.toggleCrouch));
+    if ("toggleSprint" in canonical) canonical.toggleSprint = Boolean(Number(canonical.toggleSprint));
+    if ("graphicsMode" in canonical) canonical.graphicsPreset = graphicsModeToPreset(canonical.graphicsMode);
+    if ("renderClouds" in canonical) canonical.renderClouds = cloudsModeToModern(canonical.renderClouds);
+    if ("ao" in canonical) canonical.ao = Number(canonical.ao) > 0;
+    return { values: canonical, warnings };
+  }
+
+  for (const [key, rawValue] of Object.entries(parsed.raw)) {
+    const canonicalKey = TXT_ALIAS_TO_CANONICAL[key] || key;
+    let value = rawValue;
+
+    if (canonicalKey === "graphicsPreset") {
+      value = key === "fancyGraphics" ? (normalizeBoolean(rawValue) ? "fancy" : "fast") : unquote(rawValue);
+    } else if (canonicalKey === "language") {
+      value = rawValue;
+    } else if (canonicalKey === "mainHand") {
+      value = unquote(rawValue);
+    } else if (canonicalKey === "renderClouds") {
+      value = parsed.format === "old-txt" ? Boolean(normalizeBoolean(rawValue)) : unquote(rawValue);
+    } else if (canonicalKey === "ao") {
+      value = parsed.format === "old-txt" ? Number(normalizeNumber(rawValue)) : normalizeBoolean(rawValue);
+    } else if (canonicalKey.startsWith("key_key.")) {
+      if (parsed.format === "old-txt") {
+        value = LEGACY_KEYCODES[String(rawValue)] || String(rawValue);
+        if (!(String(rawValue) in LEGACY_KEYCODES)) {
+          warnings.push({ level: "warn", message: `Keybind "${canonicalKey}" uses legacy code "${rawValue}" which is not fully mapped.`, key: canonicalKey });
+        }
+      } else {
+        value = rawValue;
+      }
+    } else if (rawValue === "true" || rawValue === "false") {
+      value = rawValue === "true";
+    } else if (/^-?\d+(\.\d+)?$/.test(rawValue)) {
+      value = Number(rawValue);
+    } else if (/^\[.*\]$/.test(rawValue)) {
+      value = rawValue;
+    } else {
+      value = unquote(rawValue);
+    }
+
+    canonical[canonicalKey] = value;
+  }
+
+  return { values: canonical, warnings };
+}
+
+function serializeTxtValue(value, templateDefault, modernQuoting) {
+  if (typeof value === "boolean") return String(value);
+  if (typeof value === "number") {
+    if (typeof templateDefault === "string" && /^-?\d+\.\d+$/.test(templateDefault)) {
+      const decimals = (templateDefault.split(".")[1] || "").length;
+      return value.toFixed(decimals);
+    }
+    return String(value);
+  }
+  if (value === null) return "null";
+  if (typeof value === "string") {
+    if (/^\[.*\]$/.test(value)) return value;
+    if (modernQuoting && /^".*"$/.test(templateDefault)) return `"${value}"`;
+    return value;
+  }
+  return JSON.stringify(value);
+}
+
+function shouldEmitKeyForTarget(targetFormat, key) {
+  if (targetFormat !== "old-txt") return true;
+  if (key.startsWith("modelPart_")) return false;
+  if (key.startsWith("soundCategory_")) {
+    return [
+      "soundCategory_master",
+      "soundCategory_music",
+      "soundCategory_record",
+      "soundCategory_weather"
+    ].includes(key);
+  }
+  return true;
+}
+
+function serializeJsonValue(value, templateDefault) {
+  if (typeof templateDefault === "number") {
+    const numeric = typeof value === "number" ? value : normalizeNumber(value);
+    return numeric !== null ? numeric : templateDefault;
+  }
+  if (typeof templateDefault === "boolean") {
+    const booleanValue = normalizeBoolean(value);
+    return booleanValue !== null ? booleanValue : templateDefault;
+  }
+  if (templateDefault === null) return value === null ? null : templateDefault;
+  if (Array.isArray(templateDefault)) return Array.isArray(value) ? value : templateDefault;
+  return value;
+}
+
+function coerceForTarget(targetKey, targetFormat, sourceValues, templateDefault, warnings) {
+  const aliasMap = {
+    lang: "language",
+    fancyGraphics: "graphicsPreset",
+    "key_key.swapHands": "key_key.swapOffhand"
+  };
+  const sourceKey = aliasMap[targetKey] || targetKey;
+  if (!(sourceKey in sourceValues)) return { found: false, value: templateDefault };
+
+  const value = sourceValues[sourceKey];
+
+  if (targetFormat === "old-txt") {
+    if (targetKey === "lang") return { found: true, value: String(value) };
+    if (targetKey === "fancyGraphics") return { found: true, value: String(String(value).toLowerCase() !== "fast") };
+    if (targetKey === "ao") {
+      if (typeof value === "boolean") return { found: true, value: value ? "2" : "0" };
+      const numeric = typeof value === "number" ? value : normalizeNumber(value);
+      return { found: numeric !== null, value: numeric !== null ? String(Math.round(numeric)) : templateDefault };
+    }
+    if (targetKey === "renderClouds") {
+      if (typeof value === "boolean") return { found: true, value: String(value) };
+      return { found: true, value: String(String(value).toLowerCase() !== "false") };
+    }
+    if (targetKey === "mainHand") return { found: true, value: String(value) };
+    if (targetKey.startsWith("key_key.")) {
+      const modernKey = String(value);
+      if (modernKey in MODERN_TO_LEGACY) return { found: true, value: MODERN_TO_LEGACY[modernKey] };
+      warnings.push({ level: "warn", message: `Target old options.txt cannot represent keybind "${targetKey}" value "${modernKey}". Template default kept.`, key: targetKey });
+      return { found: false, value: templateDefault };
+    }
+    return { found: true, value: serializeTxtValue(value, templateDefault, false) };
+  }
+
+  if (targetFormat === "modern-txt") {
+    if (targetKey === "graphicsPreset") return { found: true, value: `"${String(value)}"` };
+    if (targetKey === "renderClouds") return { found: true, value: `"${typeof value === "boolean" ? String(value) : String(value)}"` };
+    if (targetKey === "lang") return { found: true, value: String(value) };
+    if (targetKey === "mainHand") return { found: true, value: `"${String(value)}"` };
+    if (targetKey === "ao") {
+      if (typeof value === "number") return { found: true, value: String(value > 0) };
+      return { found: true, value: String(Boolean(value)) };
+    }
+    if (targetKey.startsWith("key_key.")) return { found: true, value: String(value) };
+    return { found: true, value: serializeTxtValue(value, templateDefault, true) };
+  }
+
+  if (targetFormat === "standardsettings-json") {
+    if (targetKey === "language") return { found: true, value: { enabled: false, value: String(value) } };
+    if (targetKey === "forceUnicodeFont") return { found: true, value: { enabled: false, value: Boolean(value) } };
+    if (targetKey === "guiScale") {
+      return { found: true, value: { enabled: false, value: (typeof value === "number" ? value : normalizeNumber(value)) ?? templateDefault.value } };
+    }
+    if (targetKey === "perspective") {
+      return { found: true, value: { enabled: false, value: (typeof value === "number" ? value : normalizeNumber(value)) ?? templateDefault.value } };
+    }
+    if (targetKey === "mainHand") return { found: true, value: String(value).toLowerCase() === "left" ? 0 : 1 };
+    if (targetKey === "backgroundForChatOnly" || targetKey === "toggleCrouch" || targetKey === "toggleSprint") {
+      return { found: true, value: Boolean(value) ? 1 : 0 };
+    }
+    if (targetKey === "graphicsMode") return { found: true, value: presetToGraphicsMode(value) };
+    if (targetKey === "renderClouds") return { found: true, value: modernToCloudsMode(value) };
+    if (targetKey === "ao") {
+      if (typeof value === "boolean") return { found: true, value: value ? 2 : 0 };
+      const numeric = typeof value === "number" ? value : normalizeNumber(value);
+      return { found: numeric !== null, value: numeric !== null ? numeric : templateDefault };
+    }
+    if (targetKey.startsWith("key_key.")) return { found: true, value: String(value) };
+    return { found: true, value: serializeJsonValue(value, templateDefault) };
+  }
+
+  return { found: false, value: templateDefault };
+}
+
+function convertSettings(parsed, targetFormat) {
+  const template = buildTargetTemplate(targetFormat);
+  const templateOrder = getTemplateOrder(targetFormat).filter((key) => shouldEmitKeyForTarget(targetFormat, key));
+  const { values: sourceValues, warnings: canonicalWarnings } = toCanonical(parsed);
+  const warnings = [...parsed.warnings, ...canonicalWarnings];
+  const stats = { mapped: 0, defaulted: 0, passthrough: 0 };
+  const touchedKeys = new Set();
+
+  if (targetFormat === "standardsettings-json") {
+    for (const key of Object.keys(template)) {
+      if (key.startsWith(".")) continue;
+      const { found, value } = coerceForTarget(key, targetFormat, sourceValues, template[key], warnings);
+      if (found) {
+        template[key] = value;
+        stats.mapped += 1;
+        touchedKeys.add(key);
+      } else {
+        stats.defaulted += 1;
+      }
+    }
+
+    const jsonUnknown = Object.keys(sourceValues).filter((key) => {
+      const candidateKeys = [key];
+      if (key === "language") candidateKeys.push("lang");
+      if (key === "graphicsPreset") candidateKeys.push("fancyGraphics");
+      if (key === "key_key.swapOffhand") candidateKeys.push("key_key.swapHands");
+      return !candidateKeys.some((candidate) => candidate in template);
+    });
+
+    jsonUnknown.forEach((key) => {
+      warnings.push({ level: "warn", message: `Source key "${key}" is not emitted in DefaultSettings JSON and was not preserved.`, key });
+    });
+
+    return {
+      targetFormat,
+      outputText: JSON.stringify(template, null, 2),
+      warnings,
+      stats,
+      meta: { source: parsed.format, target: targetFormat, touchedKeys: touchedKeys.size, passthroughKeys: [] }
+    };
+  }
+
+  const outputMap = { ...template };
+  const passthrough = [];
+
+  for (const key of templateOrder) {
+    const { found, value } = coerceForTarget(key, targetFormat, sourceValues, template[key], warnings);
+    if (found) {
+      outputMap[key] = value;
+      touchedKeys.add(key);
+      stats.mapped += 1;
+    } else {
+      stats.defaulted += 1;
+    }
+  }
+
+  if (targetFormat !== "old-txt" && (parsed.format === "old-txt" || parsed.format === "modern-txt")) {
+    for (const key of parsed.order) {
+      if (key in outputMap) continue;
+      const canonicalKey = TXT_ALIAS_TO_CANONICAL[key] || key;
+      const aliasedTargetKey = targetFormat === "old-txt" && canonicalKey === "key_key.swapOffhand" ? "key_key.swapHands" : canonicalKey;
+      if (!(aliasedTargetKey in outputMap)) {
+        passthrough.push({ key, value: parsed.raw[key] });
+        stats.passthrough += 1;
+      }
+    }
+  }
+
+  const lines = [];
+  templateOrder.forEach((key) => lines.push(`${key}:${outputMap[key]}`));
+
+  if (passthrough.length > 0) {
+    lines.push("");
+    lines.push("# passthrough-unmapped");
+    passthrough.forEach(({ key, value }) => {
+      lines.push(`${key}:${value}`);
+      warnings.push({ level: "warn", message: `Preserved unknown key "${key}" at the end of the target file.`, key });
+    });
+  }
+
+  return {
+    targetFormat,
+    outputText: lines.join("\n"),
+    warnings,
+    stats,
+    meta: { source: parsed.format, target: targetFormat, touchedKeys: touchedKeys.size, passthroughKeys: passthrough.map((entry) => entry.key) }
+  };
+}
+
+function renderWarnings(warnings) {
+  el.warningCount.textContent = String(warnings.length);
+  if (warnings.length === 0) {
+    el.warningsList.innerHTML = `<div class="warning-item"><strong>No warnings.</strong> The conversion matched template fields cleanly.</div>`;
+    return;
+  }
+
+  el.warningsList.innerHTML = warnings.map((warning) => {
+    const className = warning.level === "error" ? "warning-item error" : "warning-item";
+    return `<div class="${className}"><strong>${warning.key || "notice"}</strong><br>${escapeHtml(warning.message)}</div>`;
+  }).join("");
+}
+
+function renderStats(stats) {
+  el.mappedCount.textContent = String(stats.mapped);
+  el.defaultedCount.textContent = String(stats.defaulted);
+  el.passthroughCount.textContent = String(stats.passthrough);
+}
+
+function updateStatus(text) {
+  el.convertStatus.textContent = text;
+  el.topStatus.textContent = text.toLowerCase();
+  el.lastUpdate.textContent = `Last action: ${new Date().toLocaleTimeString()}`;
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function detectAndRender() {
+  const parsed = safeParseSource(el.sourceText.value);
+  state.parsed = parsed;
+  el.detectedFormat.textContent = TARGET_LABELS[parsed.format] || parsed.format;
+  el.sourceMeta.textContent = parsed.format === "unknown" ? "Unknown format" : `${TARGET_LABELS[parsed.format]} • ${parsed.order.length} keys`;
+  renderWarnings(parsed.warnings);
+  renderStats({ mapped: 0, defaulted: 0, passthrough: 0 });
+  updateStatus(parsed.format === "unknown" ? "Detection failed" : "Source detected");
+}
+
+function performConversion() {
+  const parsed = safeParseSource(el.sourceText.value);
+  state.parsed = parsed;
+  el.detectedFormat.textContent = TARGET_LABELS[parsed.format] || parsed.format;
+
+  if (parsed.format === "unknown") {
+    el.outputText.value = "";
+    el.outputMeta.textContent = "No output";
+    renderWarnings(parsed.warnings);
+    renderStats({ mapped: 0, defaulted: 0, passthrough: 0 });
+    updateStatus("Conversion failed");
+    return;
+  }
+
+  const result = convertSettings(parsed, el.targetFormat.value);
+  state.lastResult = result;
+  el.outputText.value = result.outputText;
+  el.outputMeta.textContent = `${TARGET_LABELS[result.targetFormat]} • ${result.meta.touchedKeys} mapped template keys`;
+  el.sourceMeta.textContent = `${TARGET_LABELS[parsed.format]} • ${parsed.order.length} keys`;
+  renderWarnings(result.warnings);
+  renderStats(result.stats);
+  updateStatus(`Converted to ${TARGET_LABELS[result.targetFormat]}`);
+}
+
+function loadExample(format) {
+  if (!format || !(format in SAMPLE_TEXT)) return;
+  el.sourceText.value = SAMPLE_TEXT[format];
+  detectAndRender();
+}
+
+function swapInputOutput() {
+  if (!el.outputText.value.trim()) return;
+  const previousSource = el.sourceText.value;
+  const previousTarget = el.targetFormat.value;
+  const detectedOutput = detectFormat(el.outputText.value);
+
+  el.sourceText.value = el.outputText.value;
+  el.outputText.value = previousSource;
+  if (state.parsed && state.parsed.format && state.parsed.format !== "unknown") {
+    el.targetFormat.value = state.parsed.format;
+  } else if (detectedOutput !== "unknown") {
+    el.targetFormat.value = previousTarget;
+  }
+  detectAndRender();
+  updateStatus("Swapped source and output");
+}
+
+function downloadOutput() {
+  const output = el.outputText.value;
+  if (!output.trim()) {
+    updateStatus("Nothing to download");
+    return;
+  }
+  const format = el.targetFormat.value;
+  const blob = new Blob([output], { type: format === "standardsettings-json" ? "application/json" : "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = TEMPLATE_FILES[format];
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  updateStatus(`Downloaded ${a.download}`);
+}
+
+function updateFooterGifVisibility() {
+  const footerGif = document.querySelector(".footer-gif");
+  const scroller = document.querySelector(".editor");
+  if (!footerGif || !scroller) return;
+  const hasScrolled = scroller.scrollTop > 32;
+  footerGif.classList.toggle("visible", hasScrolled);
+}
+
+el.detectBtn.addEventListener("click", detectAndRender);
+el.convertBtn.addEventListener("click", performConversion);
+el.loadBtn.addEventListener("click", () => loadExample(el.loadExample.value));
+el.swapBtn.addEventListener("click", swapInputOutput);
+el.downloadBtn.addEventListener("click", downloadOutput);
+el.loadExample.addEventListener("change", () => el.loadExample.value && loadExample(el.loadExample.value));
+
+el.fileInput.addEventListener("change", async (event) => {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  el.sourceText.value = text;
+  detectAndRender();
+  updateStatus(`Loaded ${file.name}`);
+});
+
+el.sourceText.addEventListener("input", () => {
+  el.sourceMeta.textContent = "Unsaved input";
+});
+
+document.querySelector(".editor").addEventListener("scroll", updateFooterGifVisibility);
+
+document.addEventListener("keydown", (event) => {
+  const modeSpan = document.querySelector(".mode");
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "enter") {
+    event.preventDefault();
+    performConversion();
+    modeSpan.innerText = "RUN";
+    modeSpan.style.background = "var(--neon-green)";
+    return;
+  }
+  if (event.key === "i") {
+    modeSpan.innerText = "INSERT";
+    modeSpan.style.background = "var(--neon-green)";
+  } else if (event.key === "Escape") {
+    modeSpan.innerText = "NORMAL";
+    modeSpan.style.background = "#fff";
+  }
+});
+
+loadExample("modern-txt");
+updateFooterGifVisibility();
+</script>
+</body>
+</html>
